@@ -1,0 +1,51 @@
+﻿<Window x:Class="TvControl.Player.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TvControl.Player.App"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="525">
+    
+    <Grid d:DataContext="{d:DesignInstance local:TvControlViewModel}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <Grid >
+
+            <ListView ItemsSource="{Binding TvStations}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel AllowDrop="True" Drop="UIElement_OnDrop"  HorizontalAlignment="Stretch">
+                            <Image Stretch="UniformToFill" HorizontalAlignment="Center" Height="30" Source="{Binding Image}"></Image>
+                            <TextBlock Text="{Binding Name}"></TextBlock>
+                            <TextBlock Text="{Binding FileName}"></TextBlock>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+        
+        <StackPanel Grid.Column="1">
+            <Button Content="Sender +" Command="{Binding ChangeStationCommand}">
+                <Button.CommandParameter>
+                    <system:Int32>1</system:Int32>
+                </Button.CommandParameter>
+            </Button>
+            <Button Content="Sender -" Command="{Binding ChangeStationCommand}" >
+                <Button.CommandParameter>
+                    <system:Int32>-1</system:Int32>
+                </Button.CommandParameter>
+            </Button>
+        </StackPanel>
+
+    </Grid>
+</Window>
