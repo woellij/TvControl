@@ -45,8 +45,12 @@
       <HintPath>..\..\..\.packages\reactiveui-core.7.1.0\lib\Net45\ReactiveUI.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Splat, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\.packages\Splat.1.4.0\lib\Net45\Splat.dll</HintPath>
+    <Reference Include="ReactiveUI.Fody.Helpers, Version=2.0.66.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\.packages\ReactiveUI.Fody.2.0.66\lib\net45\ReactiveUI.Fody.Helpers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Splat, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\.packages\Splat.1.6.0\lib\Net45\Splat.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -89,7 +93,24 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="TinyMessenger.cs" />
+    <Compile Include="Messenger\CancellableGenericTinyMessage.cs" />
+    <Compile Include="Messenger\DefaultTinyMessageProxy.cs" />
+    <Compile Include="DelayedAction.cs" />
+    <Compile Include="GenericTinyMessage.cs" />
+    <Compile Include="IPlaybackControl.cs" />
+    <Compile Include="Messenger\ITinyMessage.cs" />
+    <Compile Include="Messenger\ITinyMessageProxy.cs" />
+    <Compile Include="Messenger\ITinyMessageSubscription.cs" />
+    <Compile Include="Messenger\ITinyMessengerHub.cs" />
+    <Compile Include="ITvStations.cs" />
+    <Compile Include="MediaElementPlaybackControl.cs" />
+    <Compile Include="Messenger\TinyMessageSubscriptionToken.cs" />
+    <Compile Include="Messenger\TinyMessageBase.cs" />
+    <Compile Include="Messenger\TinyMessengerHub.cs" />
+    <Compile Include="Messenger\TinyMessengerSubscriptionException.cs" />
+    <Compile Include="TvControlViewModel.cs" />
+    <Compile Include="TvStation.cs" />
+    <Compile Include="TvStations.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -6,13 +6,24 @@
         xmlns:local="clr-namespace:TvControl.Player.App"
         mc:Ignorable="d" 
         Title="PlayerWindow" Height="300" Width="300">
-    <Grid Background="Black">
+    <Grid Background="Black" d:DataContext="{d:DesignInstance local:TvControlViewModel}">
         <MediaElement VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="MediaElement" x:FieldModifier="public" />
         <Grid Margin="50" Height="50" Visibility="Collapsed"   VerticalAlignment="Bottom" HorizontalAlignment="Stretch"  x:FieldModifier="public" x:Name="VolumeIndicator">
-            <ProgressBar   Minimum="0" Maximum="1" Value="{Binding Volume, Mode=OneWay}" />
+            <ProgressBar Background="White"  Minimum="0" Maximum="1" Value="{Binding Volume, Mode=OneWay}" />
             <TextBlock FontSize="34" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" Text="{Binding DisplayVolume}"></TextBlock>
         </Grid>
         <Button VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="100" Height="100" Opacity="0" Click="ToggleFullscreenOnClick" />
+        
+        <Grid Height="80" x:Name="StationIndicator" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="50">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Image VerticalAlignment="Stretch" Margin="10,0" Source="{Binding SelectedStation.Image, Mode=OneWay}"></Image>
+            <Border Grid.Column="1" Background="White">
+                <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="20,10" Foreground="Black" FontSize="34" Text="{Binding SelectedStation.Name, Mode=OneWay}"></TextBlock>
+            </Border>
+        </Grid>
     </Grid>
 </Window>
 
