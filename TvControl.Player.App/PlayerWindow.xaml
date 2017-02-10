@@ -4,10 +4,21 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TvControl.Player.App"
-        mc:Ignorable="d" WindowStyle="None"
+        mc:Ignorable="d" 
         Title="PlayerWindow" Height="300" Width="300">
     <Grid Background="Black">
-        <MediaElement VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="MediaElement" x:FieldModifier="public"></MediaElement>
-        
+        <MediaElement VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="MediaElement" x:FieldModifier="public" />
+        <Grid Margin="50" Height="50" Visibility="Collapsed"   VerticalAlignment="Bottom" HorizontalAlignment="Stretch"  x:FieldModifier="public" x:Name="VolumeIndicator">
+            <ProgressBar   Minimum="0" Maximum="1" Value="{Binding Volume, Mode=OneWay}" />
+            <TextBlock FontSize="34" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Black" Text="{Binding DisplayVolume}"></TextBlock>
+        </Grid>
+        <Button VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="100" Height="100" Opacity="0" Click="ToggleFullscreenOnClick" />
     </Grid>
 </Window>
+
+
+
+
+
+
+

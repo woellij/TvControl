@@ -13,5 +13,12 @@ namespace TvControl.Player.App
     /// </summary>
     public partial class App : Application
     {
+
+        public App()
+        {
+            this.InitializeComponent();
+            base.ShutdownMode = ShutdownMode.OnMainWindowClose;
+        }
+
     }
 }

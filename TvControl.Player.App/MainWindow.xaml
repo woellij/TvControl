@@ -45,6 +45,16 @@
                     <system:Int32>-1</system:Int32>
                 </Button.CommandParameter>
             </Button>
+            <RepeatButton Content="Volume +" Command="{Binding ChangeVolumeCommand}">
+                <RepeatButton.CommandParameter>
+                    <system:Int32>1</system:Int32>
+                </RepeatButton.CommandParameter>
+            </RepeatButton>
+            <RepeatButton Content="Volume -" Command="{Binding ChangeVolumeCommand}" >
+                <RepeatButton.CommandParameter>
+                    <system:Int32>-1</system:Int32>
+                </RepeatButton.CommandParameter>
+            </RepeatButton>
         </StackPanel>
 
     </Grid>

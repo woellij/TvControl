@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reactive;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -32,7 +33,7 @@ namespace TvControl.Player.App
 
             var messenger = new TinyMessengerHub();
 
-            this.DataContext = new TvControlViewModel(new TvStations(), new MediaElementPlayback(playerWindow.MediaElement));
+            this.DataContext = playerWindow.DataContext = new TvControlViewModel(new TvStations(), new MediaElementPlayback(playerWindow));
         }
 
         private void UIElement_OnDrop(object sender, DragEventArgs e)
@@ -58,17 +59,78 @@ namespace TvControl.Player.App
 
     }
 
+    public class DelayedAction : IDisposable
+    {
+
+        private readonly Action<CancellationToken> action;
+        private readonly TimeSpan delay;
+        private readonly Func<CancellationToken, Task> taskaction;
+        private CancellationTokenSource cts;
+
+        public DelayedAction(Action<CancellationToken> action, TimeSpan delay)
+        {
+            this.action = action;
+            this.delay = delay;
+        }
+
+        public DelayedAction(Func<CancellationToken, Task> action, TimeSpan delay)
+        {
+            this.taskaction = action;
+            this.delay = delay;
+        }
+
+        public void Dispose()
+        {
+            this.cts.Cancel();
+        }
+
+        public IDisposable Run(CancellationToken cancellationToken)
+        {
+            this.cts = new CancellationTokenSource();
+            this.Schedule(CancellationTokenSource.CreateLinkedTokenSource(this.cts.Token, cancellationToken).Token);
+            return this;
+        }
+
+        private async void Schedule(CancellationToken cancellation)
+        {
+            try {
+                await Task.Delay(this.delay, cancellation);
+                if (cancellation.IsCancellationRequested) {
+                    return;
+                }
+
+                Func<CancellationToken, Task> func = this.taskaction;
+                if (func != null) {
+                    await func(cancellation).ConfigureAwait(false);
+                }
+                else {
+                    Action<CancellationToken> action = this.action;
+                    action?.Invoke(cancellation);
+                }
+            }
+            catch (OperationCanceledException) {
+            }
+        }
+
+    }
+
     public class MediaElementPlayback : IPlaybackControl
     {
 
         private readonly MediaElement mediaElement;
-        private DateTimeOffset startTime;
+        private readonly DateTimeOffset startTime;
 
-        public MediaElementPlayback(MediaElement mediaElement)
+        private readonly PlayerWindow window;
+        private IDisposable hideVolumeIndicatorAction;
+
+        public MediaElementPlayback(PlayerWindow window)
         {
-            this.mediaElement = mediaElement;
+            this.window = window;
+            this.mediaElement = window.MediaElement;
             this.startTime = DateTimeOffset.UtcNow;
         }
+
+        public double Volume => this.mediaElement.Volume;
 
         public Task SetStationAsync(TvStation tvStation)
         {
@@ -77,9 +139,22 @@ namespace TvControl.Player.App
             return Task.FromResult(tvStation);
         }
 
-        public Task ChangeVolume(int direction)
+        public double ChangeVolume(int direction)
         {
-            return Task.FromResult(true);
+            double volume = this.mediaElement.Volume + (direction > 0 ? .05 : -.05);
+            volume = volume > 1 ? 1D : volume <= 0 ? 0 : volume;
+            this.mediaElement.Volume = volume;
+            this.ToggleVolumeIndicator();
+
+            return volume;
+        }
+
+        private void ToggleVolumeIndicator()
+        {
+            this.window.VolumeIndicator.Visibility = Visibility.Visible;
+            this.hideVolumeIndicatorAction?.Dispose();
+            this.hideVolumeIndicatorAction =
+                new DelayedAction(token => { this.window.VolumeIndicator.Visibility = Visibility.Collapsed; }, TimeSpan.FromSeconds(3)).Run(CancellationToken.None);
         }
 
     }
@@ -137,9 +212,11 @@ namespace TvControl.Player.App
     public interface IPlaybackControl
     {
 
+        double Volume { get; }
+
         Task SetStationAsync(TvStation tvStation);
 
-        Task ChangeVolume(int direction);
+        double ChangeVolume(int direction);
 
     }
 
@@ -177,21 +254,31 @@ namespace TvControl.Player.App
             this.control = control;
 
             this.InitAsync();
+            this.Volume = control.Volume;
 
             this.WhenAnyValue(model => model.SelectedIndex).Subscribe(index => { this.control.SetStationAsync(this.SelectedStation); });
+            this.WhenAnyValue(model => model.Volume).Subscribe(vol => this.DisplayVolume = Math.Round(100 * vol, 0, MidpointRounding.AwayFromZero).ToString());
 
             this.ChangeStationCommand = ReactiveCommand.Create<int>(dir =>
             {
                 int newIndexAbsolute = this.SelectedIndex + (dir > 0 ? 1 : -1);
                 this.SelectedIndex = newIndexAbsolute < 0 ? this.TvStations.Count - 1 : newIndexAbsolute >= this.TvStations.Count ? 0 : newIndexAbsolute;
             });
+
+            this.ChangeVolumeCommand = ReactiveCommand.Create<int>(dir => { this.Volume = this.control.ChangeVolume(dir); });
         }
+
+        public double Volume { get; set; }
+
+        public string DisplayVolume { get; private set; }
 
         public ReactiveCommand<int, Unit> ChangeStationCommand { get; set; }
 
         public ObservableCollection<TvStation> TvStations { get; set; }
 
         public int SelectedIndex { get; set; }
+
+        public ReactiveCommand<int, Unit> ChangeVolumeCommand { get; }
 
         private TvStation SelectedStation => this.TvStations[this.SelectedIndex];
 
