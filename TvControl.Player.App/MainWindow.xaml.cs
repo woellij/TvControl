@@ -32,15 +32,12 @@ namespace TvControl.Player.App
 
                 // Assuming you have one file that you care about, pass it off to whatever
                 // handling code you have defined.
+                var tvControlViewModel = (TvControlViewModel) this.DataContext;
                 var station = ((FrameworkElement) sender).DataContext as TvStation;
-                ObservableCollection<TvStation> stations = ((TvControlViewModel) this.DataContext).TvStations;
-                int index = stations.IndexOf(station);
-
-                foreach (string file in files) {
-                    TvStation tvStation = stations[index];
-                    tvStation.FileUrl = new Uri(file);
-                    tvStation.FileName = tvStation.FileUrl.Segments.LastOrDefault();
-                    index++;
+                if (files.Length == 1)
+                    tvControlViewModel.AppendVideoFile(station, files[0]);
+                else if (files.Length > 1) {
+                    tvControlViewModel.AppendVideoFiles(station, files);
                 }
             }
         }
