@@ -7,15 +7,19 @@
         xmlns:system="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
-    
+
     <Grid d:DataContext="{d:DesignInstance local:TvControlViewModel}">
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+    <Grid >
         <Grid.ColumnDefinitions>
             <ColumnDefinition></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
         <Grid >
-
             <ListView ItemsSource="{Binding TvStations}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
@@ -57,5 +61,8 @@
             </RepeatButton>
         </StackPanel>
 
+    </Grid>
+
+        <ListView Grid.Row="1" ItemsSource="{Binding Log.Items}"></ListView>
     </Grid>
 </Window>

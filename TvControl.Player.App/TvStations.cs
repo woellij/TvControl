@@ -23,9 +23,12 @@ namespace TvControl.Player.App
         private void AppendImage(TvStation station)
         {
             string resource = this.resources.FirstOrDefault(filename => filename.Contains($".{station.Id}."));
-            Stream stream = this.GetType().Assembly.GetManifestResourceStream(resource);
-            var bitmapImage = new BitmapImage();
+            Stream fileStream = this.GetType().Assembly.GetManifestResourceStream(resource);
 
+            MemoryStream stream = new MemoryStream();
+            fileStream.CopyTo(stream);
+            
+            var bitmapImage = new BitmapImage();
             bitmapImage.BeginInit();
             bitmapImage.StreamSource = stream;
             bitmapImage.CacheOption = BitmapCacheOption.OnLoad;

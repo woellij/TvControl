@@ -4,12 +4,15 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 
 using PropertyChanged;
 
 using ReactiveUI;
+
+using Splat;
 
 namespace TvControl.Player.App
 {
@@ -27,11 +30,17 @@ namespace TvControl.Player.App
             this.tvStations = tvStations;
             this.control = control;
 
+            Current = this;
+
             this.InitAsync();
             this.Volume = control.Volume;
 
-            this.WhenAnyValue(model => model.SelectedIndex).Select(i => this.TvStations[i]).ToProperty(this, model => model.SelectedStation, out this.selectedStation);
-            this.WhenAnyValue(model => model.SelectedStation).Subscribe(station => { this.control.SetStation(station); });
+            this.WhenAnyValue(model => model.SelectedIndex)
+                .ObserveOnDispatcher()
+                .Select(i => this.TvStations[i])
+                .ToProperty(this, model => model.SelectedStation, out this.selectedStation);
+
+            this.WhenAnyValue(model => model.SelectedStation).ObserveOnDispatcher().Subscribe(station => { this.control.SetStation(station); });
 
             this.WhenAnyValue(model => model.Volume).Subscribe(vol => this.DisplayVolume = Math.Round(100 * vol, 0, MidpointRounding.AwayFromZero).ToString());
 
@@ -40,9 +49,18 @@ namespace TvControl.Player.App
                 int newIndexAbsolute = this.SelectedIndex + (dir > 0 ? 1 : -1);
                 this.SelectedIndex = newIndexAbsolute < 0 ? this.TvStations.Count - 1 : newIndexAbsolute >= this.TvStations.Count ? 0 : newIndexAbsolute;
             });
-
-            this.ChangeVolumeCommand = ReactiveCommand.Create<int>(dir => { this.Volume = this.control.ChangeVolume(dir); });
+            
+            this.ChangeVolumeCommand = ReactiveCommand.Create<int, Unit>(dir =>
+            {
+                RxApp.MainThreadScheduler.Schedule(() =>
+                {
+                    this.Volume = this.control.ChangeVolume(dir);
+                });
+                return Unit.Default;
+            });
         }
+
+        public static TvControlViewModel Current { get; private set; }
 
         public double Volume { get; set; }
 
@@ -58,6 +76,8 @@ namespace TvControl.Player.App
 
         public TvStation SelectedStation => this.selectedStation.Value;
 
+        public LogViewModel Log { get; } = new LogViewModel();
+
         private async Task InitAsync()
         {
             this.TvStations = new ObservableCollection<TvStation>(await this.tvStations.GetAllAsync());
@@ -67,9 +87,8 @@ namespace TvControl.Player.App
         {
             var fileInfo = new FileInfo(filePath);
             string stationId;
-            if (!this.TryGetStationId(filePath, out stationId))
-            {
-                var extension = Path.GetExtension(filePath);
+            if (!this.TryGetStationId(filePath, out stationId)) {
+                string extension = Path.GetExtension(filePath);
                 string fileName = Path.GetFileNameWithoutExtension(filePath);
                 fileInfo.Rename(fileName + "_station_" + station.Id + "_" + extension);
             }
@@ -81,7 +100,7 @@ namespace TvControl.Player.App
             try {
                 string[] split = Path.GetFileNameWithoutExtension(fileNameOrPath).Split(new[] { "_station_" }, StringSplitOptions.RemoveEmptyEntries);
                 if (split.Length == 2) {
-                    split = split[1].Split(new [] {'_'}, StringSplitOptions.RemoveEmptyEntries);
+                    split = split[1].Split(new[] { '_' }, StringSplitOptions.RemoveEmptyEntries);
                     stationId = split[0];
                     return true;
                 }
@@ -107,6 +126,7 @@ namespace TvControl.Player.App
                         continue;
                     }
                 }
+
                 tvStation = this.TvStations[index];
                 SetFileProperties(tvStation, file);
                 index++;
@@ -117,6 +137,46 @@ namespace TvControl.Player.App
         {
             tvStation.FileUrl = new Uri(file);
             tvStation.FileName = tvStation.FileUrl.Segments.LastOrDefault();
+        }
+
+    }
+
+    public class LogViewModel : ILogger
+    {
+
+        public LogViewModel()
+        {
+            this.Items = new ObservableCollection<LogItem>();
+        }
+
+        public ObservableCollection<LogItem> Items { get; set; }
+
+        public LogLevel Level { get; set; }
+
+        public void Write(string message, LogLevel logLevel)
+        {
+            this.Items.Add(new LogItem(message, logLevel, DateTimeOffset.UtcNow));
+        }
+
+    }
+
+    public class LogItem
+    {
+
+        public LogItem(string message, LogLevel logLevel, DateTimeOffset time)
+        {
+            this.Message = message;
+            this.Level = logLevel;
+            this.Time = time;
+        }
+
+        public LogLevel Level { get; }
+        public string Message { get; }
+        public DateTimeOffset Time { get; }
+
+        public override string ToString()
+        {
+            return $"{this.Level}\t{this.Time:G}\t message";
         }
 
     }

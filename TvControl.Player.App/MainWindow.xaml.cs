@@ -1,9 +1,18 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
+using System.Reactive.Concurrency;
 using System.Windows;
 
+using AutoMapper;
+
+using Nancy.Hosting.Self;
+
+using ReactiveUI;
+
+using Splat;
+
 using TinyMessenger;
+
+using TvControl.ConsoleApp;
 
 namespace TvControl.Player.App
 {
@@ -13,15 +22,46 @@ namespace TvControl.Player.App
     public partial class MainWindow : Window
     {
 
+        private NancyHost host;
+
+        private UDPListener udpListener;
+
         public MainWindow()
         {
             this.InitializeComponent();
+
+            RxApp.MainThreadScheduler = new DispatcherScheduler(this.Dispatcher);
+
+            Mapper.Initialize(expression =>
+            {
+                AutoMapperConfig.Init(expression);
+                expression.CreateMissingTypeMaps = true;
+            });
+
             var playerWindow = new PlayerWindow();
             playerWindow.Show();
 
+            this.Init(playerWindow);
+        }
+
+        private async void Init(PlayerWindow playerWindow)
+        {
             var messenger = new TinyMessengerHub();
 
-            this.DataContext = playerWindow.DataContext = new TvControlViewModel(new TvStations(), new MediaElementPlaybackControl(playerWindow));
+            TvControlViewModel viewModel;
+            this.DataContext = playerWindow.DataContext = viewModel = new TvControlViewModel(new TvStations(), new MediaElementPlaybackControl(playerWindow));
+            this.udpListener = new UDPListener(11011, s => viewModel.Log.Write(s, LogLevel.Debug));
+            await this.udpListener.StartAsync();
+
+            var uriString = "http://localhost:8080/tvcontrolapi/";
+            this.host = new NancyHost(new HostConfiguration {
+                UrlReservations = new UrlReservations {
+                    CreateAutomatically = true
+                }
+            }, new Uri(uriString));
+            this.host.Start();
+            Console.WriteLine($"Running on {uriString}");
+            Console.ReadLine();
         }
 
         private void UIElement_OnDrop(object sender, DragEventArgs e)
@@ -34,8 +74,9 @@ namespace TvControl.Player.App
                 // handling code you have defined.
                 var tvControlViewModel = (TvControlViewModel) this.DataContext;
                 var station = ((FrameworkElement) sender).DataContext as TvStation;
-                if (files.Length == 1)
+                if (files.Length == 1) {
                     tvControlViewModel.AppendVideoFile(station, files[0]);
+                }
                 else if (files.Length > 1) {
                     tvControlViewModel.AppendVideoFiles(station, files);
                 }

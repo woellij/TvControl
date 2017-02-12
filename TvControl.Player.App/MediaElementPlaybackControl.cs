@@ -1,6 +1,5 @@
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -32,9 +31,19 @@ namespace TvControl.Player.App
             if (tvStation == null) {
                 return;
             }
-            this.mediaElement.Source = tvStation.FileUrl;
-            this.mediaElement.Position = DateTimeOffset.UtcNow - this.startTime;
-            this.ToggleStationIndicator();
+
+            if (tvStation.FileUrl == null) {
+                try {
+                    this.mediaElement.Stop();
+                }
+                catch { }
+                this.mediaElement.Source = null;
+            }
+            else {
+                this.mediaElement.Source = tvStation.FileUrl;
+                this.mediaElement.Position = DateTimeOffset.UtcNow - this.startTime;
+                this.ToggleStationIndicator();
+            }
         }
 
         public double ChangeVolume(int direction)
