@@ -13,10 +13,10 @@ namespace TvControl.Player.App.Bot.Dialogs
     {
 
         [Expression("@stationDirection")]
-        [Expression("@station @stationDirection")]
-        [Expression("@stationDirection @station")]
-        [Expression("@station @direction")]
-        [Expression("@direction @station")]
+        [Expression("@stationAddress @stationDirection")]
+        [Expression("@stationDirection @stationAddress")]
+        [Expression("@stationAddress @direction")]
+        [Expression("@direction @stationAddress")]
         public void StationChange(Context context, Result result)
         {
             var direction = result.GetDirectionEnum(new[] {
@@ -31,5 +31,20 @@ namespace TvControl.Player.App.Bot.Dialogs
             TvControlViewModel.Current.ChangeStationCommand.Execute(intDirection);
         }
 
+
+        [Expression("@station")]
+        [Expression("@stationAdress @station")]
+        [Expression("@station @stationAdress")]
+        [Expression("Schalte zu @stationAdress")]
+        [Expression("Wechsle zu @stationAdress")]
+        public void SetStation(Context context, Result result)
+        {
+            var stationEntity = result.Entities.OfType<StationEntity>("station");
+            if (stationEntity?.Station == null) {
+                return;
+            }
+
+            TvControlViewModel.Current.SetCurrentStation(stationEntity.Station);
+        }
     }
 }

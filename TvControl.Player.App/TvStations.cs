@@ -38,16 +38,16 @@ namespace TvControl.Player.App
 
         private IEnumerable<TvStation> GetStations()
         {
-            yield return new TvStation("1", "ARD");
-            yield return new TvStation("26", "ZDF");
-            yield return new TvStation("5", "BR");
-            yield return new TvStation("4", "3sat");
+            yield return new TvStation("1", "ARD", "Das Erste", "Ersten", "Erste", "Erstes");
+            yield return new TvStation("26", "ZDF", "Das Zweite", "Zweiten", "Zweite", "Zweites");
+            yield return new TvStation("5", "BR", "Bayerischer Rundfunk", "Dritte", "Drittes", "Das Dritte");
+            yield return new TvStation("4", "3sat", "drei satt", "3 satt", "dreisatt", "drei sat");
             yield return new TvStation("2", "arte");
-            yield return new TvStation("16", "Pro 7");
-            yield return new TvStation("19", "Sat1");
-            yield return new TvStation("24", "VOX");
-            yield return new TvStation("27", "Kabel 1");
-            yield return new TvStation("35", "ARD alpha");
+            yield return new TvStation("16", "Pro 7", "Pro sieben");
+            yield return new TvStation("19", "Sat1", "sat eins", "satt eins", "sateins", "satteins"); 
+            yield return new TvStation("24", "VOX", "Fox", "Foxx");
+            yield return new TvStation("27", "Kabel 1", "Kabel eins", "kabeleins", "Kabel ein", "kabelein"); 
+            yield return new TvStation("35", "ARD alpha", "alpha", "br alpha");
         }
 
     }

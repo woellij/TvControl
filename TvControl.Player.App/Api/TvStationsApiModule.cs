@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 using AutoMapper;
@@ -26,15 +25,13 @@ namespace TvControl.Player.App.Api
             this.Post["setCurrent", "/set/{id}"] = o =>
             {
                 TvControlViewModel tvControlViewModel = TvControlViewModel.Current;
-
-                TvStation selected = tvControlViewModel.TvStations.FirstOrDefault(station => station.Id == o.id);
-                if (selected != null) {
-                    tvControlViewModel.SelectedIndex = tvControlViewModel.TvStations.IndexOf(selected);
-                    return HttpStatusCode.OK;
+                if (!tvControlViewModel.SetCurrentStation(o.id)) {
+                    var r = (Response) "invalid station id";
+                    r.StatusCode = HttpStatusCode.BadRequest;
+                    return r;
                 }
-                var r = (Response)"invalid station id";
-                r.StatusCode = HttpStatusCode.BadRequest;
-                return r;
+
+                return HttpStatusCode.Accepted;
             };
         }
 

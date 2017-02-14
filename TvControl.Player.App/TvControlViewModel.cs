@@ -49,13 +49,10 @@ namespace TvControl.Player.App
                 int newIndexAbsolute = this.SelectedIndex + (dir > 0 ? 1 : -1);
                 this.SelectedIndex = newIndexAbsolute < 0 ? this.TvStations.Count - 1 : newIndexAbsolute >= this.TvStations.Count ? 0 : newIndexAbsolute;
             });
-            
+
             this.ChangeVolumeCommand = ReactiveCommand.Create<int, Unit>(dir =>
             {
-                RxApp.MainThreadScheduler.Schedule(() =>
-                {
-                    this.Volume = this.control.ChangeVolume(dir);
-                });
+                RxApp.MainThreadScheduler.Schedule(() => { this.Volume = this.control.ChangeVolume(dir); });
                 return Unit.Default;
             });
         }
@@ -137,6 +134,22 @@ namespace TvControl.Player.App
         {
             tvStation.FileUrl = new Uri(file);
             tvStation.FileName = tvStation.FileUrl.Segments.LastOrDefault();
+        }
+
+        public bool SetCurrentStation(string id)
+        {
+            TvStation selected = this.TvStations.FirstOrDefault(station => station.Id == id);
+            return this.SetCurrentStation(selected);
+        }
+
+        public bool SetCurrentStation(TvStation selected)
+        {
+            if (selected != null) {
+                this.SelectedIndex = this.TvStations.IndexOf(selected);
+                return true;
+            }
+
+            return false;
         }
 
     }

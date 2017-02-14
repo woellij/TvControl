@@ -162,6 +162,7 @@
     <Compile Include="Bot\Entities\Direction.cs" />
     <Compile Include="Bot\Entities\StationDirection.cs" />
     <Compile Include="Bot\Extensions\ResultExtensions.cs" />
+    <Compile Include="Bot\StationRecognizer.cs" />
     <Compile Include="Bot\TvBot.cs" />
     <Compile Include="Bot\Entities\VolumeDirection.cs" />
     <Compile Include="Messenger\CancellableGenericTinyMessage.cs" />
