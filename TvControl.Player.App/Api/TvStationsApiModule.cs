@@ -10,17 +10,6 @@ using TvControl.Player.App.Api.Models.Response;
 
 namespace TvControl.Player.App.Api
 {
-    public class VolumeModule : NancyModule
-    {
-
-        public VolumeModule() : base("volume")
-        {
-            this.Post["volumeUp", "/up"] = o => TvControlViewModel.Current.ChangeVolumeCommand.Execute(+1);
-            this.Post["volumeUp", "/down"] = o => TvControlViewModel.Current.ChangeVolumeCommand.Execute(-1);
-        }
-
-    }
-
     public class TvStationsModule : NancyModule
     {
 

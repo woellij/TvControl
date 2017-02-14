@@ -19,6 +19,7 @@ namespace TvControl.Player.App
             this.InitializeComponent();
             base.ShutdownMode = ShutdownMode.OnMainWindowClose;
         }
+        
 
     }
 }

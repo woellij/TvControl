@@ -41,6 +41,10 @@
       <HintPath>..\..\..\.packages\AutoMapper.5.2.0\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Jint, Version=2.9.1.0, Culture=neutral, PublicKeyToken=2e92ba9c8d81157f, processorArchitecture=MSIL">
+      <HintPath>..\..\..\.packages\Jint.2.9.1\lib\portable-net40+sl50+win+WindowsPhoneApp81+wp80\Jint.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Nancy, Version=1.4.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\..\.packages\Nancy.1.4.1\lib\net40\Nancy.dll</HintPath>
       <Private>True</Private>
@@ -83,6 +87,26 @@
     </Reference>
     <Reference Include="Splat, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\..\.packages\Splat.1.6.0\lib\Net45\Splat.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Syn.Bot, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\.packages\Syn.Bot.2.0.1\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+xamarinios10+MonoTouch10\Syn.Bot.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Syn.Log, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\.packages\Syn.Log.1.0.5\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+xamarinios10+MonoTouch10\Syn.Log.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Syn.Neuro, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\.packages\Syn.Neuro.1.0.0\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+xamarinios10+MonoTouch10\Syn.Neuro.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Syn.VA, Version=1.0.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\.packages\Syn.VA.1.0.6\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+xamarinios10+MonoTouch10\Syn.VA.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Syn.WordNet, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\.packages\Syn.WordNet.1.0.1\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+xamarinios10+MonoTouch10\Syn.WordNet.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -129,8 +153,17 @@
       <Link>UDPListener.cs</Link>
     </Compile>
     <Compile Include="Api\Models\Response\ApiTvStation.cs" />
+    <Compile Include="Api\TextControlModule.cs" />
     <Compile Include="Api\TvStationsApiModule.cs" />
+    <Compile Include="Api\VolumeModule.cs" />
     <Compile Include="AutoMapperConfig.cs" />
+    <Compile Include="Bot\Dialogs\StationDialog.cs" />
+    <Compile Include="Bot\Dialogs\VolumeDialog.cs" />
+    <Compile Include="Bot\Entities\Direction.cs" />
+    <Compile Include="Bot\Entities\StationDirection.cs" />
+    <Compile Include="Bot\Extensions\ResultExtensions.cs" />
+    <Compile Include="Bot\TvBot.cs" />
+    <Compile Include="Bot\Entities\VolumeDirection.cs" />
     <Compile Include="Messenger\CancellableGenericTinyMessage.cs" />
     <Compile Include="Messenger\DefaultTinyMessageProxy.cs" />
     <Compile Include="DelayedAction.cs" />

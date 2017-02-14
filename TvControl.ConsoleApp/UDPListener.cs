@@ -8,11 +8,12 @@ using Sockets.Plugin.Abstractions;
 
 namespace TvControl.ConsoleApp
 {
-    public class UDPListener
+    public class UDPListener : IDisposable
     {
 
         private readonly int listenPort;
         private readonly Action<string> log;
+        private UdpSocketReceiver receiver;
 
         public UDPListener(int listenPort, Action<string> log)
         {
@@ -24,7 +25,7 @@ namespace TvControl.ConsoleApp
         {
             List<CommsInterface> interfaces = await CommsInterface.GetAllInterfacesAsync();
 
-            var receiver = new UdpSocketReceiver();
+            this.receiver = new UdpSocketReceiver();
 
             receiver.MessageReceived += this.ReceiverOnMessageReceived;
 
@@ -48,6 +49,11 @@ namespace TvControl.ConsoleApp
             new UdpSocketClient().SendToAsync(Encoding.UTF8.GetBytes(content), args.RemoteAddress, 11010);
 
             this.log($"received from {from}; message: '{data}'");
+        }
+
+        public void Dispose()
+        {
+            this.receiver?.Dispose();
         }
 
     }

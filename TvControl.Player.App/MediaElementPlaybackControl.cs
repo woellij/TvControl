@@ -34,9 +34,12 @@ namespace TvControl.Player.App
 
             if (tvStation.FileUrl == null) {
                 try {
-                    this.mediaElement.Stop();
+                    if (this.mediaElement.Source != null) {
+                        this.mediaElement.Stop();
+                    }
                 }
-                catch { }
+                catch {
+                }
                 this.mediaElement.Source = null;
             }
             else {

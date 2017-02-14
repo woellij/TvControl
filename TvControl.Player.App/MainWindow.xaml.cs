@@ -22,7 +22,7 @@ namespace TvControl.Player.App
     public partial class MainWindow : Window
     {
 
-        private NancyHost host;
+        public NancyHost Host { get; private set; }
 
         private UDPListener udpListener;
 
@@ -44,6 +44,13 @@ namespace TvControl.Player.App
             this.Init(playerWindow);
         }
 
+        protected override void OnClosed(EventArgs e)
+        {
+            this.Host.Dispose();
+            this.udpListener.Dispose();
+            base.OnClosed(e);
+        }
+
         private async void Init(PlayerWindow playerWindow)
         {
             var messenger = new TinyMessengerHub();
@@ -53,13 +60,13 @@ namespace TvControl.Player.App
             this.udpListener = new UDPListener(11011, s => viewModel.Log.Write(s, LogLevel.Debug));
             await this.udpListener.StartAsync();
 
-            var uriString = "http://localhost:8080/tvcontrolapi/";
-            this.host = new NancyHost(new HostConfiguration {
+            var uriString = "http://localhost:8090/tvcontrolapi/";
+            this.Host = new NancyHost(new HostConfiguration {
                 UrlReservations = new UrlReservations {
                     CreateAutomatically = true
                 }
             }, new Uri(uriString));
-            this.host.Start();
+            this.Host.Start();
             Console.WriteLine($"Running on {uriString}");
             Console.ReadLine();
         }
