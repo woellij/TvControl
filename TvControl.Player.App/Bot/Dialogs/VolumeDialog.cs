@@ -9,10 +9,8 @@ namespace TvControl.Player.App.Bot.Dialogs
     {
 
         [Expression("@volumeDirection")]
-        [Expression("Lautstärke @direction")]
+        [Expression("@volumeAddress @direction")]
         [Expression("@direction die Lautstärke")]
-        [Expression("Volume @direction")]
-        [Expression("Pegel @direction")]
         public void VolumeChange(Context context, Result result)
         {
             IEntity appEntity = result.Entities.OfType("app");

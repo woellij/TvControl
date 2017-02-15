@@ -61,7 +61,7 @@ namespace TvControl.Player.App
             await this.udpListener.StartAsync();
 
             var uriString = "http://localhost:8090/tvcontrolapi/";
-            this.Host = new NancyHost(new HostConfiguration {
+            this.Host = new NancyHost(new CustomNancyBoostrapper(), new HostConfiguration {
                 UrlReservations = new UrlReservations {
                     CreateAutomatically = true
                 }

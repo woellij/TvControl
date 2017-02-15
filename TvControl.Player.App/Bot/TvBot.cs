@@ -19,7 +19,7 @@ namespace TvControl.Player.App.Bot
             bot.CreateRecognizer<VolumeDirection>("volumeDirection");
             bot.CreateRecognizer<Direction>("direction");
             bot.CreateRecognizer<StationDirection>("stationDirection");
-
+            bot.CreateRecognizer("volumeAddress", new[] { "Lautstärke", "Pegel", "Volume" });
             bot.CreateRecognizer("stationAddress", new[] { "Sender", "Kanal", "Fernsehsender", "Fernsehkanal", "TV-Sender", "Programm" });
             bot.Recognizers.Add(new StationRecognizer(() => TvControlViewModel.Current.TvStations));
             

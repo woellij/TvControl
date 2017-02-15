@@ -53,6 +53,10 @@
       <HintPath>..\..\..\.packages\Nancy.Hosting.Self.1.4.1\lib\net40\Nancy.Hosting.Self.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Nancy.Linker, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\.packages\Nancy.Linker.0.3.1\lib\net40-Client\Nancy.Linker.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Nancy.Owin, Version=1.4.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\..\.packages\Nancy.Owin.1.4.1\lib\net40\Nancy.Owin.dll</HintPath>
       <Private>True</Private>
@@ -153,9 +157,9 @@
       <Link>UDPListener.cs</Link>
     </Compile>
     <Compile Include="Api\Models\Response\ApiTvStation.cs" />
-    <Compile Include="Api\TextControlModule.cs" />
-    <Compile Include="Api\TvStationsApiModule.cs" />
-    <Compile Include="Api\VolumeModule.cs" />
+    <Compile Include="Api\Modules\TextControlModule.cs" />
+    <Compile Include="Api\Modules\TvStationsApiModule.cs" />
+    <Compile Include="Api\Modules\VolumeModule.cs" />
     <Compile Include="AutoMapperConfig.cs" />
     <Compile Include="Bot\Dialogs\StationDialog.cs" />
     <Compile Include="Bot\Dialogs\VolumeDialog.cs" />
@@ -165,6 +169,7 @@
     <Compile Include="Bot\StationRecognizer.cs" />
     <Compile Include="Bot\TvBot.cs" />
     <Compile Include="Bot\Entities\VolumeDirection.cs" />
+    <Compile Include="Api\CustomNancyBoostrapper.cs" />
     <Compile Include="Messenger\CancellableGenericTinyMessage.cs" />
     <Compile Include="Messenger\DefaultTinyMessageProxy.cs" />
     <Compile Include="DelayedAction.cs" />
