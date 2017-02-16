@@ -45,8 +45,8 @@ namespace TvControl.Player.App
             else {
                 this.mediaElement.Source = tvStation.FileUrl;
                 this.mediaElement.Position = DateTimeOffset.UtcNow - this.startTime;
-                this.ToggleStationIndicator();
             }
+            this.ToggleStationIndicator();
         }
 
         public double ChangeVolume(int direction)

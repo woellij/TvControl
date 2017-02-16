@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Threading.Tasks;
 using System.Windows;
+
+using ReactiveUI;
 
 namespace TvControl.Player.App
 {
@@ -18,8 +21,16 @@ namespace TvControl.Player.App
         {
             this.InitializeComponent();
             base.ShutdownMode = ShutdownMode.OnMainWindowClose;
+
+            RxApp.MainThreadScheduler = new DispatcherScheduler(this.Dispatcher);
+            RxApp.SupportsRangeNotifications = false;
         }
-        
+
+        protected override void OnActivated(EventArgs e)
+        {
+
+            base.OnActivated(e);
+        }
 
     }
 }

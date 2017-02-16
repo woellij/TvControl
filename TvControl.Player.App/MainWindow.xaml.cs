@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Reactive.Concurrency;
 using System.Windows;
 
 using AutoMapper;
 
 using Nancy.Hosting.Self;
-
-using ReactiveUI;
+using Nancy.TinyIoc;
 
 using Splat;
 
@@ -22,15 +20,11 @@ namespace TvControl.Player.App
     public partial class MainWindow : Window
     {
 
-        public NancyHost Host { get; private set; }
-
         private UDPListener udpListener;
 
         public MainWindow()
         {
             this.InitializeComponent();
-
-            RxApp.MainThreadScheduler = new DispatcherScheduler(this.Dispatcher);
 
             Mapper.Initialize(expression =>
             {
@@ -44,6 +38,8 @@ namespace TvControl.Player.App
             this.Init(playerWindow);
         }
 
+        public NancyHost Host { get; private set; }
+
         protected override void OnClosed(EventArgs e)
         {
             this.Host.Dispose();
@@ -55,11 +51,6 @@ namespace TvControl.Player.App
         {
             var messenger = new TinyMessengerHub();
 
-            TvControlViewModel viewModel;
-            this.DataContext = playerWindow.DataContext = viewModel = new TvControlViewModel(new TvStations(), new MediaElementPlaybackControl(playerWindow));
-            this.udpListener = new UDPListener(11011, s => viewModel.Log.Write(s, LogLevel.Debug));
-            await this.udpListener.StartAsync();
-
             var uriString = "http://localhost:8090/tvcontrolapi/";
             this.Host = new NancyHost(new CustomNancyBoostrapper(), new HostConfiguration {
                 UrlReservations = new UrlReservations {
@@ -67,6 +58,15 @@ namespace TvControl.Player.App
                 }
             }, new Uri(uriString));
             this.Host.Start();
+
+            TvControlViewModel viewModel;
+            this.DataContext = playerWindow.DataContext = viewModel = new TvControlViewModel(new TvStations(), new MediaElementPlaybackControl(playerWindow));
+
+            new TasksWindow { DataContext = TinyIoCContainer.Current.Resolve<TasksViewModel>() }.Show();
+
+            this.udpListener = new UDPListener(11011, s => viewModel.Log.Write(s, LogLevel.Debug));
+            await this.udpListener.StartAsync();
+
             Console.WriteLine($"Running on {uriString}");
             Console.ReadLine();
         }
