@@ -11,6 +11,7 @@ using Splat;
 using TinyMessenger;
 
 using TvControl.ConsoleApp;
+using TvControl.Player.App.Model;
 
 namespace TvControl.Player.App
 {
@@ -58,6 +59,7 @@ namespace TvControl.Player.App
                 }
             }, new Uri(uriString));
             this.Host.Start();
+            TinyIoCContainer.Current.Register<ITasksService>((container, overloads) => new LocalTasksServiceDecorator(new FirebaseTasksService()));
 
             TvControlViewModel viewModel;
             this.DataContext = playerWindow.DataContext = viewModel = new TvControlViewModel(new TvStations(), new MediaElementPlaybackControl(playerWindow));

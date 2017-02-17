@@ -6,14 +6,11 @@ using System.Threading.Tasks;
 
 using AutoMapper;
 
-using FireSharp;
-using FireSharp.Config;
-using FireSharp.Interfaces;
-using FireSharp.Response;
-
 using PropertyChanged;
 
 using ReactiveUI;
+
+using TvControl.Player.App.Model;
 
 namespace TvControl.Player.App
 {
@@ -21,16 +18,12 @@ namespace TvControl.Player.App
     internal class TasksViewModel : ReactiveObject
     {
 
-        private readonly FirebaseClient client;
-        private readonly string tasksKey = "tasks";
+        private readonly ITasksService tasksService;
 
-        public TasksViewModel()
+        public TasksViewModel(ITasksService
+            tasksService)
         {
-            IFirebaseConfig config = new FirebaseConfig {
-                AuthSecret = "prF1qa1F5FdzT8XXdPyGRct5TUzEUUaFjtCiycOW",
-                BasePath = "https://tvcontrolapp.firebaseio.com/"
-            };
-            this.client = new FirebaseClient(config);
+            this.tasksService = tasksService;
 
             this.Tasks = new ReactiveList<TvControlTaskViewModel> { ChangeTrackingEnabled = true };
 
@@ -52,83 +45,36 @@ namespace TvControl.Player.App
 
         private async Task SaveAsync()
         {
-            List<TvControlTaskViewModel> newOnes = this.Tasks.Where(model => string.IsNullOrEmpty(model.Id)).ToList();
-            if (newOnes.Any()) {
-                foreach (TvControlTaskViewModel newOne in newOnes) {
-                    newOne.Id = Guid.NewGuid().ToString("N");
-                    var tvControlTask = Mapper.Map<TvControlTask>(newOne);
-                    await this.client.SetAsync(this.GetDbPath(newOne), tvControlTask);
-                    newOne.Changed = false;
-                }
+            List<IndexedItem<TvControlTaskViewModel>> indexed = this.Tasks.Select(IndexedItem<TvControlTaskViewModel>.Create).ToList();
+
+            foreach (IndexedItem<TvControlTaskViewModel> newOne in indexed.Where(i => string.IsNullOrWhiteSpace(i.Object.Id)).ToList()) {
+                newOne.Object.Id = Guid.NewGuid().ToString("N");
+                await this.tasksService.CreateTaskAsync(newOne.To<TvControlTask>());
+                indexed.Remove(newOne);
             }
 
-            foreach (TvControlTaskViewModel deleted in this.Tasks.Where(model => string.IsNullOrWhiteSpace(model.Description))) {
-                await this.client.DeleteAsync(this.GetDbPath(deleted));
-                this.Tasks.Remove(deleted);
+            foreach (IndexedItem<TvControlTaskViewModel> deleted in indexed.Where(ii => string.IsNullOrWhiteSpace(ii.Object.Description))) {
+                await this.tasksService.DeleteTaskAsync(deleted.Object.Id);
+                this.Tasks.Remove(deleted.Object);
+                indexed.Remove(deleted);
             }
 
-            List<TvControlTaskViewModel> changedOnes = this.Tasks.Where(model => model.Changed).ToList();
-            foreach (TvControlTaskViewModel changedOne in changedOnes) {
-                var tvControlTask = Mapper.Map<TvControlTask>(changedOne);
-                await this.client.UpdateAsync(this.GetDbPath(changedOne), tvControlTask);
-                changedOne.Changed = false;
+            foreach (IndexedItem<TvControlTaskViewModel> changedOne in indexed) {
+                await this.tasksService.UpdateTaskAsync(changedOne.To<TvControlTask>());
             }
-        }
-
-        private string GetDbPath(TvControlTaskViewModel task)
-        {
-            return $"{this.tasksKey}/{task.Id}";
         }
 
         private async Task InitAsync()
         {
-            try {
-                FirebaseResponse response = await this.client.GetAsync(this.tasksKey);
-                var tvControlTasks = response.ResultAs<Dictionary<string, TvControlTask>>();
-                if (tvControlTasks == null) {
-                    return;
-                }
+            IEnumerable<TvControlTask> tasks = await this.tasksService.GetTasksAsync();
+            if (tasks == null) {
+                return;
+            }
 
-                IEnumerable<TvControlTaskViewModel> tvControlViewModels = tvControlTasks.Select(t => Mapper.Map<TvControlTaskViewModel>(t.Value)).ToList();
-                this.Tasks.AddRange(tvControlViewModels);
-            }
-            catch {
-            }
+            tasks = tasks.OrderBy(task => task.Position);
+            IEnumerable<TvControlTaskViewModel> tvControlViewModels = tasks?.Select(Mapper.Map<TvControlTaskViewModel>).ToList();
+            this.Tasks.AddRange(tvControlViewModels);
         }
-
-    }
-
-    [ImplementPropertyChanged]
-    internal class TvControlTask
-    {
-
-        public string Id { get; set; }
-
-        public virtual string Description { get; set; }
-
-    }
-
-    [ImplementPropertyChanged]
-    class TvControlTaskViewModel : TvControlTask
-    {
-
-        private string description;
-        private string original;
-
-        public override string Description {
-            get { return this.description; }
-            set {
-                if (this.description == null) {
-                    this.original = value;
-                }
-                else {
-                    this.Changed = string.Equals(this.original, value);
-                }
-                this.description = value;
-            }
-        }
-
-        public bool Changed { get; set; }
 
     }
 }
