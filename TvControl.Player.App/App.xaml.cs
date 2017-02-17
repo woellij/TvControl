@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Reactive.Concurrency;
-using System.Threading.Tasks;
+﻿using System.Reactive.Concurrency;
 using System.Windows;
 
 using ReactiveUI;
@@ -12,7 +6,7 @@ using ReactiveUI;
 namespace TvControl.Player.App
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    ///     Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
@@ -20,16 +14,9 @@ namespace TvControl.Player.App
         public App()
         {
             this.InitializeComponent();
-            base.ShutdownMode = ShutdownMode.OnMainWindowClose;
-
+            this.ShutdownMode = ShutdownMode.OnMainWindowClose;
             RxApp.MainThreadScheduler = new DispatcherScheduler(this.Dispatcher);
             RxApp.SupportsRangeNotifications = false;
-        }
-
-        protected override void OnActivated(EventArgs e)
-        {
-
-            base.OnActivated(e);
         }
 
     }

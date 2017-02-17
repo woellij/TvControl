@@ -1,6 +1,6 @@
 ﻿using Syn.Bot.Oscova.Attributes;
 
-namespace TvControl.Player.App.Bot
+namespace TvControl.Player.App.Bot.Entities
 {
     public enum VolumeDirection
     {

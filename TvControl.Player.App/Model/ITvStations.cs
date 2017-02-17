@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace TvControl.Player.App
+namespace TvControl.Player.App.Model
 {
     public interface ITvStations
     {

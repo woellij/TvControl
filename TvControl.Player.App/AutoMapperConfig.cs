@@ -6,6 +6,7 @@ using AutoMapper;
 
 using TvControl.Player.App.Api;
 using TvControl.Player.App.Api.Models.Response;
+using TvControl.Player.App.Model;
 
 namespace TvControl.Player.App
 {

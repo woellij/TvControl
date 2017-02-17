@@ -3,7 +3,7 @@ using Nancy.Linker;
 using Nancy.Routing;
 using Nancy.TinyIoc;
 
-namespace TvControl.Player.App
+namespace TvControl.Player.App.Api
 {
     internal class CustomNancyBoostrapper : DefaultNancyBootstrapper
     {

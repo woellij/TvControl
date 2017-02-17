@@ -1,4 +1,4 @@
-namespace TinyMessenger
+namespace TvControl.Player.App.Messenger
 {
     /// <summary>
     /// Generic message with user specified content

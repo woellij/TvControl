@@ -11,6 +11,8 @@ using Nancy.Linker;
 
 using TvControl.Player.App.Api.Models;
 using TvControl.Player.App.Api.Models.Response;
+using TvControl.Player.App.Model;
+using TvControl.Player.App.ViewModels;
 
 namespace TvControl.Player.App.Api.Modules
 {

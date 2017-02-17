@@ -6,7 +6,7 @@ using System.Windows.Media;
 
 using PropertyChanged;
 
-namespace TvControl.Player.App
+namespace TvControl.Player.App.Model
 {
     [ImplementPropertyChanged]
     public class TvStation

@@ -3,6 +3,9 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 
+using TvControl.Player.App.Common;
+using TvControl.Player.App.Model;
+
 namespace TvControl.Player.App
 {
     public class MediaElementPlaybackControl : IPlaybackControl
@@ -13,11 +16,11 @@ namespace TvControl.Player.App
         private readonly MediaElement mediaElement;
         private readonly DateTimeOffset startTime;
 
-        private readonly PlayerWindow window;
+        private readonly Windows.PlayerWindow window;
         private IDisposable hideStationIndicatorAction;
         private IDisposable hideVolumeIndicatorAction;
 
-        public MediaElementPlaybackControl(PlayerWindow window)
+        public MediaElementPlaybackControl(Windows.PlayerWindow window)
         {
             this.window = window;
             this.mediaElement = window.MediaElement;

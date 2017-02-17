@@ -8,12 +8,13 @@ using Nancy.TinyIoc;
 
 using Splat;
 
-using TinyMessenger;
-
 using TvControl.ConsoleApp;
+using TvControl.Player.App.Api;
+using TvControl.Player.App.Messenger;
 using TvControl.Player.App.Model;
+using TvControl.Player.App.ViewModels;
 
-namespace TvControl.Player.App
+namespace TvControl.Player.App.Windows
 {
     /// <summary>
     ///     Interaction logic for MainWindow.xaml
@@ -50,8 +51,6 @@ namespace TvControl.Player.App
 
         private async void Init(PlayerWindow playerWindow)
         {
-            var messenger = new TinyMessengerHub();
-
             var uriString = "http://localhost:8090/tvcontrolapi/";
             this.Host = new NancyHost(new CustomNancyBoostrapper(), new HostConfiguration {
                 UrlReservations = new UrlReservations {
@@ -59,22 +58,24 @@ namespace TvControl.Player.App
                 }
             }, new Uri(uriString));
             this.Host.Start();
-            TinyIoCContainer tinyIoCContainer = TinyIoCContainer.Current;
-            tinyIoCContainer.Register<ITasksService>((container, overloads) => new LocalTasksServiceDecorator(new FirebaseTasksService()));
-            tinyIoCContainer.AutoRegister();
+
+            TinyIoCContainer ioc = TinyIoCContainer.Current;
+            ioc.AutoRegister();
+            ioc.Register<ITasksService>((container, overloads) => new LocalTasksServiceDecorator(new FirebaseTasksService()));
 
             var playbackControl = new MediaElementPlaybackControl(playerWindow);
-            tinyIoCContainer.Register<IPlaybackControl>(playbackControl);
+            ioc.Register<IPlaybackControl>(playbackControl);
             TvControlViewModel viewModel;
             this.DataContext = playerWindow.DataContext = viewModel = new TvControlViewModel(new TvStations(), playbackControl);
 
-            new TasksWindow { DataContext = tinyIoCContainer.Resolve<TasksViewModel>() }.Show();
+            ioc.Register<ILogger>(viewModel.Log);
+
+            viewModel.Log.Write($"API Running on {uriString}", LogLevel.Info);
+
+            new TasksWindow { DataContext = ioc.Resolve<TasksViewModel>() }.Show();
 
             this.udpListener = new UDPListener(11011, s => viewModel.Log.Write(s, LogLevel.Debug));
             await this.udpListener.StartAsync();
-
-            Console.WriteLine($"Running on {uriString}");
-            Console.ReadLine();
         }
 
         private void UIElement_OnDrop(object sender, DragEventArgs e)

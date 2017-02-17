@@ -2,6 +2,9 @@
 using Syn.Bot.Oscova.Entities;
 
 using TvControl.Player.App.Bot.Dialogs;
+using TvControl.Player.App.Bot.Entities;
+using TvControl.Player.App.Model;
+using TvControl.Player.App.ViewModels;
 
 namespace TvControl.Player.App.Bot
 {

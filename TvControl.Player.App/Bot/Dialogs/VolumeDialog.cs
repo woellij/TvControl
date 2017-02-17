@@ -3,6 +3,9 @@ using Syn.Bot.Oscova.Attributes;
 using Syn.Bot.Oscova.Entities;
 using Syn.Bot.Oscova.Interfaces;
 
+using TvControl.Player.App.Bot.Entities;
+using TvControl.Player.App.ViewModels;
+
 namespace TvControl.Player.App.Bot.Dialogs
 {
     public class VolumeDialog : Dialog

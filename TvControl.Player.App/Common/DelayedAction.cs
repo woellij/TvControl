@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TvControl.Player.App
+namespace TvControl.Player.App.Common
 {
     public class DelayedAction : IDisposable
     {

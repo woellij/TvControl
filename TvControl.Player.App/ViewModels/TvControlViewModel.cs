@@ -1,6 +1,5 @@
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reactive;
@@ -12,9 +11,10 @@ using PropertyChanged;
 
 using ReactiveUI;
 
-using Splat;
+using TvControl.Player.App.Extensions;
+using TvControl.Player.App.Model;
 
-namespace TvControl.Player.App
+namespace TvControl.Player.App.ViewModels
 {
     [ImplementPropertyChanged]
     public class TvControlViewModel : ViewModelBase
@@ -36,6 +36,7 @@ namespace TvControl.Player.App
             this.Volume = control.Volume;
 
             this.WhenAnyValue(model => model.SelectedIndex)
+                .Where(i => i > 0)
                 .ObserveOnDispatcher()
                 .Select(i => this.TvStations[i])
                 .ToProperty(this, model => model.SelectedStation, out this.selectedStation);
@@ -67,7 +68,7 @@ namespace TvControl.Player.App
 
         public ObservableCollection<TvStation> TvStations { get; set; }
 
-        public int SelectedIndex { get; set; }
+        public int SelectedIndex { get; set; } = -1;
 
         public ReactiveCommand<int, Unit> ChangeVolumeCommand { get; }
 
@@ -150,66 +151,6 @@ namespace TvControl.Player.App
             }
 
             return false;
-        }
-
-    }
-
-    public class LogViewModel : ILogger
-    {
-
-        public LogViewModel()
-        {
-            this.Items = new ObservableCollection<LogItem>();
-        }
-
-        public ObservableCollection<LogItem> Items { get; set; }
-
-        public LogLevel Level { get; set; }
-
-        public void Write(string message, LogLevel logLevel)
-        {
-            this.Items.Add(new LogItem(message, logLevel, DateTimeOffset.UtcNow));
-        }
-
-    }
-
-    public class LogItem
-    {
-
-        public LogItem(string message, LogLevel logLevel, DateTimeOffset time)
-        {
-            this.Message = message;
-            this.Level = logLevel;
-            this.Time = time;
-        }
-
-        public LogLevel Level { get; }
-        public string Message { get; }
-        public DateTimeOffset Time { get; }
-
-        public override string ToString()
-        {
-            return $"{this.Level}\t{this.Time:G}\t message";
-        }
-
-    }
-
-    public static class ExtendedMethod
-    {
-
-        public static void Rename(this FileInfo fileInfo, string newName)
-        {
-            fileInfo.MoveTo(fileInfo.Directory.FullName + "\\" + newName);
-        }
-
-    }
-
-    public class ViewModelBase : ReactiveObject, INotifyPropertyChanged
-    {
-
-        public void OnPropertyChanged(string propertyName)
-        {
-            this.RaisePropertyChanged(propertyName);
         }
 
     }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 
-namespace TvControl.Player.App
+namespace TvControl.Player.App.Model
 {
     class TvStations : ITvStations
     {

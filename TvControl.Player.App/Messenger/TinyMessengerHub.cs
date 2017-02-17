@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TinyMessenger
+namespace TvControl.Player.App.Messenger
 {
     /// <summary>
     /// Messenger hub responsible for taking subscriptions/publications and delivering of messages.

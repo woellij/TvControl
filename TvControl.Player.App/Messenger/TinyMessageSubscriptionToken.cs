@@ -1,6 +1,6 @@
 using System;
 
-namespace TinyMessenger
+namespace TvControl.Player.App.Messenger
 {
     /// <summary>
     /// Represents an active subscription to a message

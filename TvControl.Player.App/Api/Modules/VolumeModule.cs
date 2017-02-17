@@ -1,5 +1,7 @@
 using Nancy;
 
+using TvControl.Player.App.ViewModels;
+
 namespace TvControl.Player.App.Api.Modules
 {
     public class VolumeModule : NancyModule

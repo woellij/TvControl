@@ -1,6 +1,6 @@
 using System;
 
-namespace TinyMessenger
+namespace TvControl.Player.App.Messenger
 {
     /// <summary>
     /// Thrown when an exceptions occurs while subscribing to a message type

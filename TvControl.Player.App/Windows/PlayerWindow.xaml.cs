@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace TvControl.Player.App
+namespace TvControl.Player.App.Windows
 {
     /// <summary>
     ///     Interaction logic for PlayerWindow.xaml

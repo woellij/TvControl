@@ -302,7 +302,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="..\TvControl.ConsoleApp\UDPListener.cs">
-      <Link>UDPListener.cs</Link>
+      <Link>Api\UDPListener.cs</Link>
     </Compile>
     <Compile Include="Api\Models\Response\ApiTvStation.cs" />
     <Compile Include="Api\Models\ByteArrayResponse.cs" />
@@ -319,19 +319,22 @@
     <Compile Include="Bot\TvBot.cs" />
     <Compile Include="Bot\Entities\VolumeDirection.cs" />
     <Compile Include="Api\CustomNancyBoostrapper.cs" />
-    <Compile Include="Model\CsvTaskLog.cs" />
-    <Compile Include="IndexedItem.cs" />
-    <Compile Include="Model\ITaskLog.cs" />
+    <Compile Include="Extensions\FileInfoExtensions.cs" />
+    <Compile Include="Model\LogItem.cs" />
+    <Compile Include="ViewModels\LogViewModel.cs" />
+    <Compile Include="Model\CsvEventLog.cs" />
+    <Compile Include="ViewModels\IndexedItem.cs" />
+    <Compile Include="Model\IEventLog.cs" />
     <Compile Include="Messenger\CancellableGenericTinyMessage.cs" />
     <Compile Include="Messenger\DefaultTinyMessageProxy.cs" />
-    <Compile Include="DelayedAction.cs" />
-    <Compile Include="GenericTinyMessage.cs" />
+    <Compile Include="Common\DelayedAction.cs" />
+    <Compile Include="Messenger\GenericTinyMessage.cs" />
     <Compile Include="IPlaybackControl.cs" />
     <Compile Include="Messenger\ITinyMessage.cs" />
     <Compile Include="Messenger\ITinyMessageProxy.cs" />
     <Compile Include="Messenger\ITinyMessageSubscription.cs" />
     <Compile Include="Messenger\ITinyMessengerHub.cs" />
-    <Compile Include="ITvStations.cs" />
+    <Compile Include="Model\ITvStations.cs" />
     <Compile Include="MediaElementPlaybackControl.cs" />
     <Compile Include="Messenger\TinyMessageSubscriptionToken.cs" />
     <Compile Include="Messenger\TinyMessageBase.cs" />
@@ -350,15 +353,16 @@
     <Compile Include="Model\ITasksService.cs" />
     <Compile Include="Model\LocalTasksServiceDecorator.cs" />
     <Compile Include="Model\TvControlTask.cs" />
-    <Compile Include="TasksViewModel.cs" />
-    <Compile Include="TasksWindow.xaml.cs">
+    <Compile Include="ViewModels\TasksViewModel.cs" />
+    <Compile Include="Windows\TasksWindow.xaml.cs">
       <DependentUpon>TasksWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="TvControlTaskViewModel.cs" />
-    <Compile Include="TvControlViewModel.cs" />
-    <Compile Include="TvStation.cs" />
-    <Compile Include="TvStations.cs" />
-    <Page Include="MainWindow.xaml">
+    <Compile Include="ViewModels\TvControlTaskViewModel.cs" />
+    <Compile Include="ViewModels\TvControlViewModel.cs" />
+    <Compile Include="Model\TvStation.cs" />
+    <Compile Include="Model\TvStations.cs" />
+    <Compile Include="ViewModels\ViewModelBase.cs" />
+    <Page Include="Windows\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -366,21 +370,21 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="Windows\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="PlayerWindow.xaml">
+    <Page Include="Windows\PlayerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="TasksWindow.xaml">
+    <Page Include="Windows\TasksWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PlayerWindow.xaml.cs">
+    <Compile Include="Windows\PlayerWindow.xaml.cs">
       <DependentUpon>PlayerWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">

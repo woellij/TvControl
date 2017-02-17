@@ -4,6 +4,8 @@ using System.Reflection;
 using Syn.Bot.Oscova;
 using Syn.Bot.Oscova.Entities;
 
+using TvControl.Player.App.Bot.Entities;
+
 namespace TvControl.Player.App.Bot.Extensions
 {
     public static class ResultExtensions

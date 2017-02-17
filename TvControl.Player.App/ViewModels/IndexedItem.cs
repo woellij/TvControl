@@ -1,6 +1,6 @@
 using AutoMapper;
 
-namespace TvControl.Player.App
+namespace TvControl.Player.App.ViewModels
 {
     internal class IndexedItem<T>
     {

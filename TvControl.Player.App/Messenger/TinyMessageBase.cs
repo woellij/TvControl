@@ -13,9 +13,8 @@
 //===============================================================================
 
 using System;
-using System.Text;
 
-namespace TinyMessenger
+namespace TvControl.Player.App.Messenger
 {
     #region Message Types / Interfaces
 
@@ -33,7 +32,7 @@ namespace TinyMessenger
         {
             get
             {
-                return (_Sender == null) ? null : _Sender.Target;
+                return (this._Sender == null) ? null : this._Sender.Target;
             }
         }
 
@@ -46,7 +45,7 @@ namespace TinyMessenger
             if (sender == null)
                 throw new ArgumentNullException("sender");
 
-            _Sender = new WeakReference(sender);
+            this._Sender = new WeakReference(sender);
         }
     }
 

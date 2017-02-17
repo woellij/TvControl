@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -11,35 +12,44 @@ using PropertyChanged;
 
 using ReactiveUI;
 
+using Splat;
+
 using TvControl.Player.App.Model;
 
-namespace TvControl.Player.App
+namespace TvControl.Player.App.ViewModels
 {
     [ImplementPropertyChanged]
     internal class TasksViewModel : ViewModelBase
     {
 
+        private readonly IEventLog eventLog;
+
+        private readonly ILogger logger;
+
         private readonly IPlaybackControl playbackControl;
-        private readonly ITaskLog taskLog;
 
         private readonly ITasksService tasksService;
 
         private int currentIndex;
 
-        public TasksViewModel(ITasksService tasksService, IPlaybackControl playbackControl, ITaskLog taskLog)
+        public TasksViewModel(ITasksService tasksService, IPlaybackControl playbackControl, IEventLog eventLog, ILogger logger)
         {
             this.tasksService = tasksService;
             this.playbackControl = playbackControl;
-            this.taskLog = taskLog;
+            this.eventLog = eventLog;
+            this.logger = logger;
 
             this.Tasks = new ReactiveList<TvControlTaskViewModel> { ChangeTrackingEnabled = true };
 
             this.Save = ReactiveCommand.CreateFromTask(this.SaveAsync);
             this.Add = ReactiveCommand.Create(this.AddImpl);
             this.StartStop = ReactiveCommand.Create(this.StartStopImpl);
+            this.SetFinished = ReactiveCommand.Create<bool, Unit>(this.SetFinishedImpl, this.WhenAnyValue(model => model.CurrentTask).Select(model => model != null));
 
             this.InitAsync();
         }
+
+        public ReactiveCommand<bool, Unit> SetFinished { get; }
 
         public TvControlTaskViewModel CurrentTask { get; private set; }
 
@@ -51,27 +61,52 @@ namespace TvControl.Player.App
 
         public ReactiveList<TvControlTaskViewModel> Tasks { get; }
 
+        private Unit SetFinishedImpl(bool success)
+        {
+            this.SetFinishedTime();
+
+            this.eventLog.OnComplete(this.CurrentTask, success);
+
+            this.CurrentTask = null;
+            return Unit.Default;
+        }
+
         private void StartStopImpl()
         {
             if (this.playbackControl.IsDisplayingMessage) {
+                // hide message
                 this.playbackControl.HideMessage();
-                this.taskLog.OnStart(this.CurrentTask);
+                if (this.currentIndex < this.Tasks.Count) {
+                    // when still in index range -> new task started
+                    this.CurrentTask = this.Tasks[this.currentIndex];
+                    this.currentIndex++;
+                    this.CurrentTask.StartTime = DateTimeOffset.UtcNow;
+                }
             }
             else {
+                this.SetFinishedTime();
                 if (this.currentIndex >= this.Tasks.Count) {
                     // finished
                     this.playbackControl.DisplayMessage("Vielen Dank. Das waren soweit alle Aufgaben");
                     // reset to be able to restart
                     this.currentIndex = 0;
-                    this.CurrentTask = null;
                 }
                 else {
-                    this.CurrentTask = this.Tasks[this.currentIndex];
-                    this.playbackControl.DisplayMessage(this.CurrentTask.Description);
-                    this.currentIndex++;
-                }
+                    if (this.CurrentTask != null) {
+                        this.logger.Write("Markiere zuerst den aktuellen Task als erfolgreich oder nicht erfolgreich abgeschlossen", LogLevel.Error);
+                        return;
+                    }
 
-                this.taskLog.OnComplete(this.CurrentTask);
+                    TvControlTaskViewModel task = this.Tasks[this.currentIndex];
+                    this.playbackControl.DisplayMessage(task.Description);
+                }
+            }
+        }
+
+        private void SetFinishedTime()
+        {
+            if (this.CurrentTask != null && this.CurrentTask.FinishedTime == default(DateTimeOffset)) {
+                this.CurrentTask.FinishedTime = DateTimeOffset.UtcNow;
             }
         }
 

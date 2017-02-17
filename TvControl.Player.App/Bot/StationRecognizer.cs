@@ -6,6 +6,8 @@ using Syn.Bot.Oscova;
 using Syn.Bot.Oscova.Collection;
 using Syn.Bot.Oscova.Interfaces;
 
+using TvControl.Player.App.Model;
+
 namespace TvControl.Player.App.Bot
 {
     internal class StationRecognizer : IEntityRecognizer
