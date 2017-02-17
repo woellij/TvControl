@@ -7,9 +7,15 @@ namespace TvControl.Player.App
 
         double Volume { get; }
 
+        bool IsDisplayingMessage { get; }
+
         void SetStation(TvStation tvStation);
 
         double ChangeVolume(int direction);
+
+        void DisplayMessage(string message);
+
+        void HideMessage();
 
     }
 }

@@ -207,7 +207,7 @@ namespace TvControl.Player.App
     public class ViewModelBase : ReactiveObject, INotifyPropertyChanged
     {
 
-        public void OnPropertChanged(string propertyName)
+        public void OnPropertyChanged(string propertyName)
         {
             this.RaisePropertyChanged(propertyName);
         }

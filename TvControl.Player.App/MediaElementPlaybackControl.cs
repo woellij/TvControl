@@ -26,6 +26,8 @@ namespace TvControl.Player.App
 
         public double Volume => this.mediaElement.Volume;
 
+        public bool IsDisplayingMessage => this.window.MessageBox.IsVisible;
+
         public void SetStation(TvStation tvStation)
         {
             if (tvStation == null) {
@@ -57,6 +59,17 @@ namespace TvControl.Player.App
             this.ToggleVolumeIndicator();
 
             return volume;
+        }
+
+        public void DisplayMessage(string message)
+        {
+            this.window.MessageTextBlock.Text = message;
+            this.window.MessageBox.Visibility = Visibility.Visible;
+        }
+
+        public void HideMessage()
+        {
+            this.window.MessageBox.Visibility = Visibility.Collapsed;
         }
 
         private void ToggleStationIndicator()

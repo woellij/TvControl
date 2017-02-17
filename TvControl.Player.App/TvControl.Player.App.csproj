@@ -319,7 +319,9 @@
     <Compile Include="Bot\TvBot.cs" />
     <Compile Include="Bot\Entities\VolumeDirection.cs" />
     <Compile Include="Api\CustomNancyBoostrapper.cs" />
+    <Compile Include="Model\CsvTaskLog.cs" />
     <Compile Include="IndexedItem.cs" />
+    <Compile Include="Model\ITaskLog.cs" />
     <Compile Include="Messenger\CancellableGenericTinyMessage.cs" />
     <Compile Include="Messenger\DefaultTinyMessageProxy.cs" />
     <Compile Include="DelayedAction.cs" />

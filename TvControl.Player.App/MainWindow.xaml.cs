@@ -59,12 +59,16 @@ namespace TvControl.Player.App
                 }
             }, new Uri(uriString));
             this.Host.Start();
-            TinyIoCContainer.Current.Register<ITasksService>((container, overloads) => new LocalTasksServiceDecorator(new FirebaseTasksService()));
+            TinyIoCContainer tinyIoCContainer = TinyIoCContainer.Current;
+            tinyIoCContainer.Register<ITasksService>((container, overloads) => new LocalTasksServiceDecorator(new FirebaseTasksService()));
+            tinyIoCContainer.AutoRegister();
 
+            var playbackControl = new MediaElementPlaybackControl(playerWindow);
+            tinyIoCContainer.Register<IPlaybackControl>(playbackControl);
             TvControlViewModel viewModel;
-            this.DataContext = playerWindow.DataContext = viewModel = new TvControlViewModel(new TvStations(), new MediaElementPlaybackControl(playerWindow));
+            this.DataContext = playerWindow.DataContext = viewModel = new TvControlViewModel(new TvStations(), playbackControl);
 
-            new TasksWindow { DataContext = TinyIoCContainer.Current.Resolve<TasksViewModel>() }.Show();
+            new TasksWindow { DataContext = tinyIoCContainer.Resolve<TasksViewModel>() }.Show();
 
             this.udpListener = new UDPListener(11011, s => viewModel.Log.Write(s, LogLevel.Debug));
             await this.udpListener.StartAsync();

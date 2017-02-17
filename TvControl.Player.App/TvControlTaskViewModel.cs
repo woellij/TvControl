@@ -3,7 +3,7 @@ using PropertyChanged;
 namespace TvControl.Player.App
 {
     [ImplementPropertyChanged]
-    class TvControlTaskViewModel
+    public class TvControlTaskViewModel
     {
         
         public string Id { get; set; }
