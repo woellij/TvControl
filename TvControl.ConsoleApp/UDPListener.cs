@@ -14,6 +14,7 @@ namespace TvControl.ConsoleApp
         private readonly int listenPort;
         private readonly Action<string> log;
         private UdpSocketReceiver receiver;
+        private int responsePort = 11010;
 
         public UDPListener(int listenPort, Action<string> log)
         {
@@ -46,7 +47,7 @@ namespace TvControl.ConsoleApp
             string data = Encoding.UTF8.GetString(args.ByteData, 0, args.ByteData.Length);
 
             var content = "roger";
-            new UdpSocketClient().SendToAsync(Encoding.UTF8.GetBytes(content), args.RemoteAddress, 11010);
+            new UdpSocketClient().SendToAsync(Encoding.UTF8.GetBytes(content), args.RemoteAddress, this.responsePort);
 
             this.log($"received from {from}; message: '{data}'");
         }

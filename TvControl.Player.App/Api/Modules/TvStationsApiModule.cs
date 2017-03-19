@@ -29,9 +29,10 @@ namespace TvControl.Player.App.Api.Modules
             {
                 TvStation[] stations = await tvStations.GetAllAsync();
                 List<ApiTvStation> apiTvStations = stations.Select(station => this.MapStation(station)).ToList();
+                TvStation selectedStation = TvControlViewModel.Current.SelectedStation;
                 return new {
                     Stations = apiTvStations,
-                    Selected = this.MapStation(TvControlViewModel.Current.SelectedStation),
+                    Selected = selectedStation == null ? null : this.MapStation(selectedStation),
                     TvControlViewModel.Current.SelectedIndex
                 };
             };
@@ -74,8 +75,8 @@ namespace TvControl.Player.App.Api.Modules
 
         private ApiTvStation MapStation(TvStation station)
         {
-            var apiTvStation = Mapper.Instance.Map<ApiTvStation>(station);
-            dynamic parameters = new {id = station.Id};
+            var apiTvStation = Mapper.Map<ApiTvStation>(station);
+            dynamic parameters = new { id = station.Id };
             Uri image = this.resourceLinker.BuildAbsoluteUri(this.Context, "StationImageRoute", parameters);
             apiTvStation.Image = image.OriginalString;
             return apiTvStation;
