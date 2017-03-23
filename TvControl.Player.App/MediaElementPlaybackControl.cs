@@ -5,6 +5,7 @@ using System.Windows.Controls;
 
 using TvControl.Player.App.Common;
 using TvControl.Player.App.Model;
+using TvControl.Player.App.Windows;
 
 namespace TvControl.Player.App
 {
@@ -16,11 +17,11 @@ namespace TvControl.Player.App
         private readonly MediaElement mediaElement;
         private readonly DateTimeOffset startTime;
 
-        private readonly Windows.PlayerWindow window;
+        private readonly PlayerWindow window;
         private IDisposable hideStationIndicatorAction;
         private IDisposable hideVolumeIndicatorAction;
 
-        public MediaElementPlaybackControl(Windows.PlayerWindow window)
+        public MediaElementPlaybackControl(PlayerWindow window)
         {
             this.window = window;
             this.mediaElement = window.MediaElement;
@@ -33,11 +34,7 @@ namespace TvControl.Player.App
 
         public void SetStation(TvStation tvStation)
         {
-            if (tvStation == null) {
-                return;
-            }
-
-            if (tvStation.FileUrl == null) {
+            if (tvStation?.FileUrl == null) {
                 try {
                     if (this.mediaElement.Source != null) {
                         this.mediaElement.Stop();

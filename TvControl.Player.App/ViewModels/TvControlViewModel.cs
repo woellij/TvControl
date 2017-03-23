@@ -36,9 +36,9 @@ namespace TvControl.Player.App.ViewModels
             this.Volume = control.Volume;
 
             this.WhenAnyValue(model => model.SelectedIndex)
-                .Where(i => i > 0)
+                //.Where(i => i >= 0)
                 .ObserveOnDispatcher()
-                .Select(i => this.TvStations[i])
+                .Select(i => this.TvStations.ElementAtOrDefault(i))
                 .ToProperty(this, model => model.SelectedStation, out this.selectedStation);
 
             this.WhenAnyValue(model => model.SelectedStation).ObserveOnDispatcher().Subscribe(station => { this.control.SetStation(station); });
@@ -150,7 +150,9 @@ namespace TvControl.Player.App.ViewModels
                 return true;
             }
 
-            return false;
+            this.SelectedIndex = -1;
+
+            return true;
         }
 
     }
