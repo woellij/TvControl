@@ -47,6 +47,12 @@ namespace TvControl.Player.App.Api.Modules
                 return HttpStatusCode.Accepted;
             };
 
+            this.Post["/showInfo"] = o =>
+            {
+                TvControlViewModel.Current.ShowInfoCommand.Execute();
+                return HttpStatusCode.Accepted;
+            };
+
             this.Get["StationImageRoute", "/image/{id}"] = o =>
             {
                 dynamic id = o.id;

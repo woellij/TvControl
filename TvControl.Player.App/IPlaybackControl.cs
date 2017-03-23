@@ -1,3 +1,6 @@
+using System.Reactive;
+using System.Threading.Tasks;
+
 using TvControl.Player.App.Model;
 
 namespace TvControl.Player.App
@@ -16,6 +19,8 @@ namespace TvControl.Player.App
         void DisplayMessage(string message);
 
         void HideMessage();
+
+        Task ToggleInfoAsync(TvStation station, bool show);
 
     }
 }

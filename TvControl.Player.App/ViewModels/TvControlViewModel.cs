@@ -24,6 +24,7 @@ namespace TvControl.Player.App.ViewModels
         private readonly ObservableAsPropertyHelper<TvStation> selectedStation;
 
         private readonly ITvStations tvStations;
+        private TvStation infoStation;
 
         public TvControlViewModel(ITvStations tvStations, IPlaybackControl control)
         {
@@ -56,9 +57,30 @@ namespace TvControl.Player.App.ViewModels
                 RxApp.MainThreadScheduler.Schedule(() => { this.Volume = this.control.ChangeVolume(dir); });
                 return Unit.Default;
             });
+
+            this.ShowInfoCommand = ReactiveCommand.Create<TvStation, Unit>(station =>
+            {
+                station = station ?? this.SelectedStation;
+                bool show = !(this.infoStation?.Id?.Equals(station?.Id) ?? false);
+                this.infoStation = station;
+
+                RxApp.MainThreadScheduler.Schedule(async () =>
+                {
+                    try {
+                        await this.control.ToggleInfoAsync(station, show);
+                    }
+                    catch {
+                    }
+                    this.infoStation = null;
+                });
+
+                return Unit.Default;
+            });
         }
 
         public static TvControlViewModel Current { get; private set; }
+
+        public ReactiveCommand<TvStation, Unit> ShowInfoCommand { get; set; }
 
         public double Volume { get; set; }
 

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -9,17 +11,78 @@ using TvControl.Player.App.Windows;
 
 namespace TvControl.Player.App
 {
+    public class NextList<T>
+    {
+
+        private readonly Func<IEnumerator<T>> factory;
+        private IEnumerator<T> enumerator;
+
+        public NextList(Func<IEnumerator<T>> enumeratorFactory)
+        {
+            this.factory = enumeratorFactory;
+        }
+
+        private IEnumerator<T> Collection {
+            get {
+                if (this.enumerator == null || !this.enumerator.MoveNext()) {
+                    this.enumerator = this.factory();
+                    this.enumerator.MoveNext();
+                }
+                return this.enumerator;
+            }
+        }
+
+        public T Next()
+        {
+            T next = this.Collection.Current;
+            return next;
+        }
+
+    }
+
+    public class ShowTexts : NextList<string>
+    {
+
+        public ShowTexts()
+            : base(TextGenerator)
+        {
+        }
+
+        private static IEnumerator<string> TextGenerator()
+        {
+            yield return
+                "Jemand musste Josef K. verleumdet haben, denn ohne dass er etwas Böses getan hätte, wurde er eines Morgens verhaftet. »Wie ein Hund!« sagte er, es war, als sollte die Scham ihn überleben. Als Gregor Samsa eines Morgens aus unruhigen Träumen erwachte, fand er sich in seinem Bett zu einem ungeheueren Ungeziefer verwandelt. "
+                ;
+
+            yield return
+                "»Es ist ein eigentümlicher Apparat«, sagte der Offizier zu dem Forschungsreisenden und überblickte mit einem gewissermaßen bewundernden Blick den ihm doch wohlbekannten Apparat. Sie hätten noch ins Boot springen können, aber der Reisende hob ein schweres, geknotetes Tau vom Boden, drohte ihnen damit und hielt sie dadurch von dem Sprunge ab."
+                ;
+
+            yield return
+                "In den letzten Jahrzehnten ist das Interesse an Hungerkünstlern sehr zurückgegangen. Aber sie überwanden sich, umdrängten den Käfig und wollten sich gar nicht fortrühren.Jemand musste Josef K. verleumdet haben, denn ohne dass er etwas Böses getan hätte, wurde er eines Morgens verhaftet."
+                ;
+
+            yield return
+                "Er hörte leise Schritte hinter sich. Das bedeutete nichts Gutes. Wer würde ihm schon folgen, spät in der Nacht und dazu noch in dieser engen Gasse mitten im übel beleumundeten Hafenviertel? Gerade jetzt, wo er das Ding seines Lebens gedreht hatte und mit der Beute verschwinden wollte!"
+                ;
+        }
+
+    }
+
     public class MediaElementPlaybackControl : IPlaybackControl
     {
 
         private readonly TimeSpan indicatorDisplayTime = TimeSpan.FromSeconds(3);
 
         private readonly MediaElement mediaElement;
+
+        readonly Random random = new Random();
         private readonly DateTimeOffset startTime;
 
         private readonly PlayerWindow window;
         private IDisposable hideStationIndicatorAction;
         private IDisposable hideVolumeIndicatorAction;
+        private readonly ShowTexts texts = new ShowTexts();
 
         public MediaElementPlaybackControl(PlayerWindow window)
         {
@@ -48,7 +111,9 @@ namespace TvControl.Player.App
                 this.mediaElement.Source = tvStation.FileUrl;
                 this.mediaElement.Position = DateTimeOffset.UtcNow - this.startTime;
             }
-            this.ToggleStationIndicator();
+            if (tvStation != null) {
+                this.ToggleStationIndicator();
+            }
         }
 
         public double ChangeVolume(int direction)
@@ -72,12 +137,41 @@ namespace TvControl.Player.App
             this.window.MessageBox.Visibility = Visibility.Collapsed;
         }
 
+        public async Task ToggleInfoAsync(TvStation station, bool show)
+        {
+            this.hideStationIndicatorAction?.Dispose();
+            if (!show) {
+                this.window.StationIndicator.Visibility = Visibility.Collapsed;
+            }
+            else {
+                TimeSpan showTime = TimeSpan.FromSeconds(20);
+                await this.ToggleStationInfo(showTime);
+            }
+        }
+
         private void ToggleStationIndicator()
         {
+            TimeSpan displayTime = this.indicatorDisplayTime;
+            this.ToggleStationInfo(displayTime);
+        }
+
+        private Task ToggleStationInfo(TimeSpan displayTime)
+        {
+            this.window.ShowProgressBar.Minimum = 0;
+            this.window.ShowProgressBar.Maximum = 1D;
+            TimeSpan progress = DateTimeOffset.UtcNow - this.startTime;
+            double value = 100 * (progress.TotalSeconds / TimeSpan.FromHours(2).TotalSeconds);
+            this.window.ShowProgressBar.Value = value > 0.1 ? value : 0.1;
+
+            this.window.ShowText.Text = this.texts.Next();
+
             this.window.StationIndicator.Visibility = Visibility.Visible;
             this.hideStationIndicatorAction?.Dispose();
+
+            Task task;
             this.hideStationIndicatorAction =
-                new DelayedAction(token => { this.window.StationIndicator.Visibility = Visibility.Collapsed; }, this.indicatorDisplayTime).Run(CancellationToken.None);
+                new DelayedAction(token => { this.window.StationIndicator.Visibility = Visibility.Collapsed; }, displayTime).Run(CancellationToken.None, out task);
+            return task;
         }
 
         private void ToggleVolumeIndicator()

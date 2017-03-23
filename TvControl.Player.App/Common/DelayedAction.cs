@@ -36,11 +36,17 @@ namespace TvControl.Player.App.Common
             return this;
         }
 
+        private TaskCompletionSource<bool> tcs;
+
+        public Task Task => this.tcs.Task;
+
         private async void Schedule(CancellationToken cancellation)
         {
+            this.tcs = new TaskCompletionSource<bool>();
             try {
                 await Task.Delay(this.delay, cancellation);
                 if (cancellation.IsCancellationRequested) {
+                    this.tcs.TrySetCanceled();
                     return;
                 }
 
@@ -52,10 +58,18 @@ namespace TvControl.Player.App.Common
                     Action<CancellationToken> action = this.action;
                     action?.Invoke(cancellation);
                 }
+                this.tcs.TrySetResult(true);
             }
             catch (OperationCanceledException) {
+                this.tcs.TrySetCanceled();
             }
         }
 
+        public IDisposable Run(CancellationToken cancellation, out Task task)
+        {
+            IDisposable disposable = this.Run(cancellation);
+            task = this.Task;
+            return disposable;
+        }
     }
 }
