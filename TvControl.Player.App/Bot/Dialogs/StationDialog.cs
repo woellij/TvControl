@@ -34,6 +34,16 @@ namespace TvControl.Player.App.Bot.Dialogs
         }
 
 
+        [Expression("Info")]
+        [Expression("Infos")]
+        [Expression("Informationen")]
+        [Expression("Details")]
+        public void ToggleStation(Context context, Result result)
+        {
+            TvControlViewModel.Current.ToggleInfoCommand.Execute();
+        }
+
+
         [Expression("@station")]
         [Expression("@stationAdress @station")]
         [Expression("@station @stationAdress")]
