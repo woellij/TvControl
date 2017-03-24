@@ -58,7 +58,7 @@ namespace TvControl.Player.App.ViewModels
                 return Unit.Default;
             });
 
-            this.ShowInfoCommand = ReactiveCommand.Create<TvStation, Unit>(station =>
+            this.ToggleInfoCommand = ReactiveCommand.Create<TvStation, Unit>(station =>
             {
                 station = station ?? this.SelectedStation;
                 bool show = !(this.infoStation?.Id?.Equals(station?.Id) ?? false);
@@ -80,7 +80,7 @@ namespace TvControl.Player.App.ViewModels
 
         public static TvControlViewModel Current { get; private set; }
 
-        public ReactiveCommand<TvStation, Unit> ShowInfoCommand { get; set; }
+        public ReactiveCommand<TvStation, Unit> ToggleInfoCommand { get; set; }
 
         public double Volume { get; set; }
 

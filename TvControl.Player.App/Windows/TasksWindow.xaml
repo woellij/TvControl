@@ -18,7 +18,24 @@
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        
         <StackPanel>
+            <Button Margin="10" Content="RESET" Background="DarkRed" Foreground="White" Command="{Binding Reset}"></Button>
+            <Border Padding="10" Background="#fccc">
+                <StackPanel>
+                    <ComboBox Margin="0,0,0,5" ItemsSource="{Binding ModalitiesSelection.Items}" SelectedItem="{Binding ModalitiesSelection.SelectedItem, Mode=TwoWay}"></ComboBox>
+                    
+                    <TextBlock Text="Proband #:" ></TextBlock>
+                    <TextBox Text="{Binding Proband.Id, Mode=TwoWay}" ></TextBox>
+
+                    <TextBlock Text="Alter:" ></TextBlock>
+                    <TextBox Text="{Binding Proband.Age, Mode=TwoWay}" ></TextBox>
+
+                    <TextBlock Text="Geschlecht:" ></TextBlock>
+                    <ComboBox Margin="0,0,0,5" ItemsSource="{Binding Genders.Items}" SelectedItem="{Binding Proband.Gender, Mode=TwoWay}"></ComboBox>
+                    
+                </StackPanel>
+            </Border>
             <Button Content="Weiter" Command="{Binding StartStop}" />
             <StackPanel Margin="6">
                 <StackPanel>

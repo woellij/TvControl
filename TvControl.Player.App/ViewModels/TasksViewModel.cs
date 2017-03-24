@@ -18,6 +18,32 @@ using TvControl.Player.App.Model;
 
 namespace TvControl.Player.App.ViewModels
 {
+    internal class Selection<TItem>
+    {
+
+        private Selection(ICollection<TItem> list)
+        {
+            this.Items = list;
+        }
+
+        public ICollection<TItem> Items { get; set; }
+        public TItem SelectedItem { get; set; }
+
+        public static Selection<TItem> FromEnum()
+        {
+            Array values = Enum.GetValues(typeof(TItem));
+            var list = new List<TItem>();
+            foreach (object value in values) {
+                if (value is TItem) {
+                    list.Add((TItem) value);
+                }
+            }
+
+            return new Selection<TItem>(list);
+        }
+
+    }
+
     [ImplementPropertyChanged]
     internal class TasksViewModel : ViewModelBase
     {
@@ -39,8 +65,13 @@ namespace TvControl.Player.App.ViewModels
             this.eventLog = eventLog;
             this.logger = logger;
 
+            this.ModalitiesSelection = Selection<Modality>.FromEnum();
+            this.Genders = Selection<Gender>.FromEnum();
+            this.Proband = new Proband();
+
             this.Tasks = new ReactiveList<TvControlTaskViewModel> { ChangeTrackingEnabled = true };
 
+            this.Reset = ReactiveCommand.Create(() => this.currentIndex = 0);
             this.Save = ReactiveCommand.CreateFromTask(this.SaveAsync);
             this.Add = ReactiveCommand.Create(this.AddImpl);
             this.StartStop = ReactiveCommand.Create(this.StartStopImpl);
@@ -48,6 +79,12 @@ namespace TvControl.Player.App.ViewModels
 
             this.InitAsync();
         }
+
+        public Selection<Gender> Genders { get; set; }
+
+        public ReactiveCommand Reset { get; set; }
+
+        public Selection<Modality> ModalitiesSelection { get; }
 
         public ReactiveCommand<bool, Unit> SetFinished { get; }
 
@@ -60,6 +97,8 @@ namespace TvControl.Player.App.ViewModels
         public ReactiveCommand<Unit, Unit> Save { get; }
 
         public ReactiveList<TvControlTaskViewModel> Tasks { get; }
+
+        public Proband Proband { get; set; }
 
         private Unit SetFinishedImpl(bool success)
         {
@@ -80,6 +119,8 @@ namespace TvControl.Player.App.ViewModels
                     // when still in index range -> new task started
                     this.CurrentTask = this.Tasks[this.currentIndex];
                     this.currentIndex++;
+                    this.CurrentTask.Proband = this.Proband;
+                    this.CurrentTask.Modality = this.ModalitiesSelection.SelectedItem;
                     this.CurrentTask.StartTime = DateTimeOffset.UtcNow;
                 }
             }
@@ -147,6 +188,23 @@ namespace TvControl.Player.App.ViewModels
             IEnumerable<TvControlTaskViewModel> tvControlViewModels = tasks?.Select(Mapper.Map<TvControlTaskViewModel>).ToList();
             this.Tasks.AddRange(tvControlViewModels);
         }
+
+    }
+
+    public class Proband
+    {
+
+        public string Id { get; set; }
+        public int Age { get; set; }
+        public Gender Gender { get; set; }
+
+    }
+
+    public enum Gender
+    {
+
+        Male,
+        Female
 
     }
 }

@@ -47,9 +47,9 @@ namespace TvControl.Player.App.Api.Modules
                 return HttpStatusCode.Accepted;
             };
 
-            this.Post["/showInfo"] = o =>
+            this.Post["/toggleInfo"] = o =>
             {
-                TvControlViewModel.Current.ShowInfoCommand.Execute();
+                TvControlViewModel.Current.ToggleInfoCommand.Execute();
                 return HttpStatusCode.Accepted;
             };
 
