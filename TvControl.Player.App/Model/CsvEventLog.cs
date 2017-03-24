@@ -47,7 +47,11 @@ namespace TvControl.Player.App.Model
             task.Success = success;
             task.CompletionTime = task.FinishedTime - task.StartTime;
 
-            string filePath = $"{task.ProbandId}.csv";
+            var folder = "logs";
+            string filePath = $"{folder}/{task.ProbandId}.csv";
+            if (!Directory.Exists(folder)) {
+                Directory.CreateDirectory(folder);
+            }
             bool isNew = !File.Exists(filePath);
             using (var csv = new CsvWriter(new StreamWriter(filePath, true), this.csvConfiguration)) {
                 if (isNew) {
