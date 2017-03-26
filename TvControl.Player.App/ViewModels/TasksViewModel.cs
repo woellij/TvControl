@@ -33,9 +33,11 @@ namespace TvControl.Player.App.ViewModels
         {
             Array values = Enum.GetValues(typeof(TItem));
             var list = new List<TItem>();
-            foreach (object value in values) {
-                if (value is TItem) {
-                    list.Add((TItem) value);
+            foreach (object value in values)
+            {
+                if (value is TItem)
+                {
+                    list.Add((TItem)value);
                 }
             }
 
@@ -71,7 +73,7 @@ namespace TvControl.Player.App.ViewModels
 
             this.Tasks = new ReactiveList<TvControlTaskViewModel> { ChangeTrackingEnabled = true };
 
-            this.Reset = ReactiveCommand.Create(() => this.currentIndex = 0);
+            this.Reset = ReactiveCommand.Create(ResetImplementation);
             this.Save = ReactiveCommand.CreateFromTask(this.SaveAsync);
             this.Add = ReactiveCommand.Create(this.AddImpl);
             this.StartStop = ReactiveCommand.Create(this.StartStopImpl);
@@ -100,6 +102,15 @@ namespace TvControl.Player.App.ViewModels
 
         public Proband Proband { get; set; }
 
+        private void ResetImplementation()
+        {
+            this.currentIndex = -1;
+            foreach (var task in this.Tasks)
+            {
+                task.FinishedTime = default(DateTimeOffset);
+            }
+        }
+
         private Unit SetFinishedImpl(bool success)
         {
             this.SetFinishedTime();
@@ -112,10 +123,19 @@ namespace TvControl.Player.App.ViewModels
 
         private void StartStopImpl()
         {
-            if (this.playbackControl.IsDisplayingMessage) {
+            if (this.currentIndex < 0)
+            {
+                // reset over command
+                this.currentIndex = 0;
+                this.playbackControl.HideMessage();
+                return;
+            }
+            if (this.playbackControl.IsDisplayingMessage)
+            {
                 // hide message
                 this.playbackControl.HideMessage();
-                if (this.currentIndex < this.Tasks.Count) {
+                if (this.currentIndex < this.Tasks.Count)
+                {
                     // when still in index range -> new task started
                     this.CurrentTask = this.Tasks[this.currentIndex];
                     this.currentIndex++;
@@ -124,31 +144,46 @@ namespace TvControl.Player.App.ViewModels
                     this.CurrentTask.StartTime = DateTimeOffset.UtcNow;
                 }
             }
-            else {
-                this.SetFinishedTime();
-                if (this.currentIndex >= this.Tasks.Count) {
+            else
+            {
+                if (this.SetFinishedTime())
+                {
+                    return;
+                }
+                if (this.currentIndex >= this.Tasks.Count)
+                {
                     // finished
                     this.playbackControl.DisplayMessage("Vielen Dank. Das waren soweit alle Aufgaben");
                     // reset to be able to restart
-                    this.currentIndex = 0;
+                    this.ResetImplementation();
                 }
-                else {
-                    if (this.CurrentTask != null) {
+                else
+                {
+                    if (this.CurrentTask != null)
+                    {
                         this.logger.Write("Markiere zuerst den aktuellen Task als erfolgreich oder nicht erfolgreich abgeschlossen", LogLevel.Error);
                         return;
                     }
 
-                    TvControlTaskViewModel task = this.Tasks[this.currentIndex];
-                    this.playbackControl.DisplayMessage(task.Description);
+                    ShowTaskInstructions();
                 }
             }
         }
 
-        private void SetFinishedTime()
+        private void ShowTaskInstructions()
         {
-            if (this.CurrentTask != null && this.CurrentTask.FinishedTime == default(DateTimeOffset)) {
+            TvControlTaskViewModel task = this.Tasks[this.currentIndex];
+            this.playbackControl.DisplayMessage(task.Description);
+        }
+
+        private bool SetFinishedTime()
+        {
+            if (this.CurrentTask != null && this.CurrentTask.FinishedTime == default(DateTimeOffset))
+            {
                 this.CurrentTask.FinishedTime = DateTimeOffset.UtcNow;
+                return true;
             }
+            return false;
         }
 
         private void AddImpl()
@@ -160,19 +195,22 @@ namespace TvControl.Player.App.ViewModels
         {
             List<IndexedItem<TvControlTaskViewModel>> indexed = this.Tasks.Select(IndexedItem<TvControlTaskViewModel>.Create).ToList();
 
-            foreach (IndexedItem<TvControlTaskViewModel> newOne in indexed.Where(i => string.IsNullOrWhiteSpace(i.Object.Id)).ToList()) {
+            foreach (IndexedItem<TvControlTaskViewModel> newOne in indexed.Where(i => string.IsNullOrWhiteSpace(i.Object.Id)).ToList())
+            {
                 newOne.Object.Id = Guid.NewGuid().ToString("N");
                 await this.tasksService.CreateTaskAsync(newOne.To<TvControlTask>());
                 indexed.Remove(newOne);
             }
 
-            foreach (IndexedItem<TvControlTaskViewModel> deleted in indexed.Where(ii => string.IsNullOrWhiteSpace(ii.Object.Description)).ToList()) {
+            foreach (IndexedItem<TvControlTaskViewModel> deleted in indexed.Where(ii => string.IsNullOrWhiteSpace(ii.Object.Description)).ToList())
+            {
                 await this.tasksService.DeleteTaskAsync(deleted.Object.Id);
                 this.Tasks.Remove(deleted.Object);
                 indexed.Remove(deleted);
             }
 
-            foreach (IndexedItem<TvControlTaskViewModel> changedOne in indexed) {
+            foreach (IndexedItem<TvControlTaskViewModel> changedOne in indexed)
+            {
                 await this.tasksService.UpdateTaskAsync(changedOne.To<TvControlTask>());
             }
         }
@@ -180,7 +218,8 @@ namespace TvControl.Player.App.ViewModels
         private async Task InitAsync()
         {
             IEnumerable<TvControlTask> tasks = await this.tasksService.GetTasksAsync();
-            if (tasks == null) {
+            if (tasks == null)
+            {
                 return;
             }
 

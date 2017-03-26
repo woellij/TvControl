@@ -66,15 +66,24 @@ namespace TvControl.Player.App.ViewModels
 
                 RxApp.MainThreadScheduler.Schedule(async () =>
                 {
-                    try {
+                    try
+                    {
                         await this.control.ToggleInfoAsync(station, show);
                     }
-                    catch {
+                    catch
+                    {
                     }
                     this.infoStation = null;
                 });
 
                 return Unit.Default;
+            });
+
+            this.ToggleOnOff = ReactiveCommand.Create(() =>
+            {
+                var isOn = this.SelectedStation != null;
+                if (isOn) this.SelectedIndex = -1;
+                else this.SelectedIndex = 0;
             });
         }
 
@@ -97,6 +106,7 @@ namespace TvControl.Player.App.ViewModels
         public TvStation SelectedStation => this.selectedStation.Value;
 
         public LogViewModel Log { get; } = new LogViewModel();
+        public ReactiveCommand ToggleOnOff { get; private set; }
 
         private async Task InitAsync()
         {
@@ -107,7 +117,8 @@ namespace TvControl.Player.App.ViewModels
         {
             var fileInfo = new FileInfo(filePath);
             string stationId;
-            if (!this.TryGetStationId(filePath, out stationId)) {
+            if (!this.TryGetStationId(filePath, out stationId))
+            {
                 string extension = Path.GetExtension(filePath);
                 string fileName = Path.GetFileNameWithoutExtension(filePath);
                 fileInfo.Rename(fileName + "_station_" + station.Id + "_" + extension);
@@ -117,15 +128,18 @@ namespace TvControl.Player.App.ViewModels
 
         private bool TryGetStationId(string fileNameOrPath, out string stationId)
         {
-            try {
+            try
+            {
                 string[] split = Path.GetFileNameWithoutExtension(fileNameOrPath).Split(new[] { "_station_" }, StringSplitOptions.RemoveEmptyEntries);
-                if (split.Length == 2) {
+                if (split.Length == 2)
+                {
                     split = split[1].Split(new[] { '_' }, StringSplitOptions.RemoveEmptyEntries);
                     stationId = split[0];
                     return true;
                 }
             }
-            catch {
+            catch
+            {
             }
 
             stationId = null;
@@ -136,12 +150,15 @@ namespace TvControl.Player.App.ViewModels
         {
             int index = this.TvStations.IndexOf(station);
 
-            foreach (string file in files) {
+            foreach (string file in files)
+            {
                 TvStation tvStation;
                 string stationId;
-                if (this.TryGetStationId(file, out stationId)) {
+                if (this.TryGetStationId(file, out stationId))
+                {
                     tvStation = this.TvStations.FirstOrDefault(s => s.Id == stationId);
-                    if (tvStation != null) {
+                    if (tvStation != null)
+                    {
                         SetFileProperties(tvStation, file);
                         continue;
                     }
@@ -167,7 +184,8 @@ namespace TvControl.Player.App.ViewModels
 
         public bool SetCurrentStation(TvStation selected)
         {
-            if (selected != null) {
+            if (selected != null)
+            {
                 this.SelectedIndex = this.TvStations.IndexOf(selected);
                 return true;
             }

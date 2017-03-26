@@ -45,7 +45,7 @@ namespace TvControl.Player.App.Model
             yield return new TvStation("2", "arte");
             yield return new TvStation("16", "Pro 7", "Pro sieben");
             yield return new TvStation("19", "Sat1", "sat eins", "satt eins", "sateins", "satteins"); 
-            yield return new TvStation("24", "VOX", "Fox", "Foxx");
+            yield return new TvStation("24", "VOX", "Fox", "Foxx", "box", "bocks");
             yield return new TvStation("27", "Kabel 1", "Kabel eins", "kabeleins", "Kabel ein", "kabelein"); 
             yield return new TvStation("35", "ARD alpha", "alpha", "br alpha");
         }

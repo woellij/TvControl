@@ -29,7 +29,7 @@ namespace TvControl.Player.App.Common
             this.cts.Cancel();
         }
 
-        public IDisposable Run(CancellationToken cancellationToken)
+        public DelayedAction Run(CancellationToken cancellationToken)
         {
             this.cts = new CancellationTokenSource();
             this.Schedule(CancellationTokenSource.CreateLinkedTokenSource(this.cts.Token, cancellationToken).Token);
@@ -37,37 +37,59 @@ namespace TvControl.Player.App.Common
         }
 
         private TaskCompletionSource<bool> tcs;
+        private CancellationToken cancellation;
 
         public Task Task => this.tcs.Task;
+        public bool IsScheduled => this.tcs != null && !this.tcs.Task.IsCompleted && !this.tcs.Task.IsCanceled && !this.Task.IsFaulted;
 
         private async void Schedule(CancellationToken cancellation)
         {
             this.tcs = new TaskCompletionSource<bool>();
-            try {
+            this.cancellation = cancellation;
+            try
+            {
                 await Task.Delay(this.delay, cancellation);
-                if (cancellation.IsCancellationRequested) {
-                    this.tcs.TrySetCanceled();
-                    return;
-                }
-
-                Func<CancellationToken, Task> func = this.taskaction;
-                if (func != null) {
-                    await func(cancellation).ConfigureAwait(false);
-                }
-                else {
-                    Action<CancellationToken> action = this.action;
-                    action?.Invoke(cancellation);
-                }
-                this.tcs.TrySetResult(true);
+                await this.ExecuteAsync();
             }
-            catch (OperationCanceledException) {
+            catch (OperationCanceledException)
+            {
                 this.tcs.TrySetCanceled();
             }
         }
 
-        public IDisposable Run(CancellationToken cancellation, out Task task)
+        public async Task<IDisposable> ExecuteAsync()
         {
-            IDisposable disposable = this.Run(cancellation);
+            if (cancellation.IsCancellationRequested)
+            {
+                this.tcs.TrySetCanceled();
+                return this;
+            }
+
+            Func<CancellationToken, Task> func = this.taskaction;
+
+            try
+            {
+                if (func != null)
+                {
+                    await func(cancellation).ConfigureAwait(false);
+                }
+                else
+                {
+                    Action<CancellationToken> action = this.action;
+                    action?.Invoke(cancellation);
+                    this.tcs.TrySetResult(true);
+                }
+            }
+            catch (Exception e)
+            {
+                this.tcs.TrySetException(e);
+            }
+            return this;
+        }
+
+        public DelayedAction Run(CancellationToken cancellation, out Task task)
+        {
+            var disposable = this.Run(cancellation);
             task = this.Task;
             return disposable;
         }

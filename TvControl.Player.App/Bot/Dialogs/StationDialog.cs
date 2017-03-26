@@ -33,6 +33,22 @@ namespace TvControl.Player.App.Bot.Dialogs
             TvControlViewModel.Current.ChangeStationCommand.Execute(intDirection);
         }
 
+        [Expression("Aus")]
+        [Expression("Ausschalten")]
+        public void TurnOff(Context context, Result result)
+        {
+            TvControlViewModel.Current.SetCurrentStation("");
+        }
+
+        [Expression("Ein")]
+        [Expression("An")]
+        [Expression("Anschalten")]
+        [Expression("Einschalten")]
+        public void TurnOn(Context context, Result result)
+        {
+            TvControlViewModel.Current.SetCurrentStation("1");
+        }
+
 
         [Expression("Info")]
         [Expression("Infos")]

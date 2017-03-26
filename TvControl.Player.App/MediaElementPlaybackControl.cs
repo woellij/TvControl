@@ -22,9 +22,12 @@ namespace TvControl.Player.App
             this.factory = enumeratorFactory;
         }
 
-        private IEnumerator<T> Collection {
-            get {
-                if (this.enumerator == null || !this.enumerator.MoveNext()) {
+        private IEnumerator<T> Collection
+        {
+            get
+            {
+                if (this.enumerator == null || !this.enumerator.MoveNext())
+                {
                     this.enumerator = this.factory();
                     this.enumerator.MoveNext();
                 }
@@ -80,7 +83,7 @@ namespace TvControl.Player.App
         private readonly DateTimeOffset startTime;
 
         private readonly PlayerWindow window;
-        private IDisposable hideStationIndicatorAction;
+        private DelayedAction hideStationIndicatorAction;
         private IDisposable hideVolumeIndicatorAction;
         private readonly ShowTexts texts = new ShowTexts();
 
@@ -89,6 +92,18 @@ namespace TvControl.Player.App
             this.window = window;
             this.mediaElement = window.MediaElement;
             this.startTime = DateTimeOffset.UtcNow;
+
+
+            this.window.ShowProgressBar.Minimum = 0;
+            this.window.ShowProgressBar.Maximum = 100D;
+
+            this.mediaElement.MediaOpened += MediaElement_MediaOpened;
+        }
+
+        TimeSpan duration;
+        private void MediaElement_MediaOpened(object sender, RoutedEventArgs e)
+        {
+            this.UpdateProgress();
         }
 
         public double Volume => this.mediaElement.Volume;
@@ -97,22 +112,32 @@ namespace TvControl.Player.App
 
         public void SetStation(TvStation tvStation)
         {
-            if (tvStation?.FileUrl == null) {
-                try {
-                    if (this.mediaElement.Source != null) {
+            if (tvStation?.FileUrl == null)
+            {
+                try
+                {
+                    if (this.mediaElement.Source != null)
+                    {
                         this.mediaElement.Stop();
                     }
                 }
-                catch {
+                catch
+                {
                 }
                 this.mediaElement.Source = null;
             }
-            else {
+            else
+            {
                 this.mediaElement.Source = tvStation.FileUrl;
-                this.mediaElement.Position = DateTimeOffset.UtcNow - this.startTime;
+                this.UpdateProgress();
             }
-            if (tvStation != null) {
+            if (tvStation != null)
+            {
                 this.ToggleStationIndicator();
+            }
+            else
+            {
+                this.hideStationIndicatorAction?.ExecuteAsync()?.ContinueWith(t => t?.Result?.Dispose());
             }
         }
 
@@ -140,10 +165,12 @@ namespace TvControl.Player.App
         public async Task ToggleInfoAsync(TvStation station, bool show)
         {
             this.hideStationIndicatorAction?.Dispose();
-            if (!show) {
+            if (!show)
+            {
                 this.window.StationIndicator.Visibility = Visibility.Collapsed;
             }
-            else {
+            else
+            {
                 TimeSpan showTime = TimeSpan.FromSeconds(20);
                 await this.ToggleStationInfo(showTime);
             }
@@ -157,11 +184,7 @@ namespace TvControl.Player.App
 
         private Task ToggleStationInfo(TimeSpan displayTime)
         {
-            this.window.ShowProgressBar.Minimum = 0;
-            this.window.ShowProgressBar.Maximum = 1D;
-            TimeSpan progress = DateTimeOffset.UtcNow - this.startTime;
-            double value = 100 * (progress.TotalSeconds / TimeSpan.FromHours(2).TotalSeconds);
-            this.window.ShowProgressBar.Value = value > 0.1 ? value : 0.1;
+            this.UpdateProgress();
 
             this.window.ShowText.Text = this.texts.Next();
 
@@ -174,8 +197,29 @@ namespace TvControl.Player.App
             return task;
         }
 
+        private void UpdateProgress()
+        {
+
+            try
+            {
+                var duration = this.mediaElement.NaturalDuration.HasTimeSpan ? this.mediaElement.NaturalDuration.TimeSpan : TimeSpan.FromMinutes(60);
+
+                var position = DateTimeOffset.UtcNow - this.startTime;
+                if (position > duration)
+                {
+                    position = TimeSpan.FromSeconds(position.TotalSeconds % duration.TotalSeconds);
+                }
+                this.mediaElement.Position = position;
+                var value = position.TotalSeconds / duration.TotalSeconds;
+                this.window.ShowProgressBar.Value = value * 100;
+
+            }
+            catch { }
+        }
+
         private void ToggleVolumeIndicator()
         {
+            this.hideStationIndicatorAction?.ExecuteAsync()?.ContinueWith(t => t?.Result?.Dispose());
             this.window.VolumeIndicator.Visibility = Visibility.Visible;
             this.hideVolumeIndicatorAction?.Dispose();
             this.hideVolumeIndicatorAction =

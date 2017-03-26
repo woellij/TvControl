@@ -30,7 +30,7 @@ namespace TvControl.Player.App.Model
 
         public Gender ProbandGender { get; set; }
 
-        public string ProbandAge { get; set; }
+        public string ProbandAge { get; set; } 
 
     }
 
@@ -47,7 +47,7 @@ namespace TvControl.Player.App.Model
             task.Success = success;
             task.CompletionTime = task.FinishedTime - task.StartTime;
 
-            var folder = "logs";
+            var folder = "../logs";
             string filePath = $"{folder}/{task.ProbandId}.csv";
             if (!Directory.Exists(folder)) {
                 Directory.CreateDirectory(folder);

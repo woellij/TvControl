@@ -14,55 +14,58 @@
             <RowDefinition></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-    <Grid >
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition></ColumnDefinition>
-            <ColumnDefinition></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-
         <Grid >
-            <ListView ItemsSource="{Binding TvStations}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}">
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
-                    </Style>
-                </ListView.ItemContainerStyle>
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel AllowDrop="True" Drop="UIElement_OnDrop"  HorizontalAlignment="Stretch">
-                            <Image Stretch="UniformToFill" HorizontalAlignment="Center" Height="30" Source="{Binding Image}"></Image>
-                            <TextBlock Text="{Binding Name}"></TextBlock>
-                            <TextBlock Text="{Binding FileName}"></TextBlock>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </Grid>
-        
-        <StackPanel Grid.Column="1">
-            <Button Content="Sender +" Command="{Binding ChangeStationCommand}">
-                <Button.CommandParameter>
-                    <system:Int32>1</system:Int32>
-                </Button.CommandParameter>
-            </Button>
-            <Button Content="Sender -" Command="{Binding ChangeStationCommand}" >
-                <Button.CommandParameter>
-                    <system:Int32>-1</system:Int32>
-                </Button.CommandParameter>
-            </Button>
-            <RepeatButton Content="Volume +" Command="{Binding ChangeVolumeCommand}">
-                <RepeatButton.CommandParameter>
-                    <system:Int32>1</system:Int32>
-                </RepeatButton.CommandParameter>
-            </RepeatButton>
-            <RepeatButton Content="Volume -" Command="{Binding ChangeVolumeCommand}" >
-                <RepeatButton.CommandParameter>
-                    <system:Int32>-1</system:Int32>
-                </RepeatButton.CommandParameter>
-            </RepeatButton>
-        </StackPanel>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
 
-    </Grid>
+            <Grid >
+                <ListView ItemsSource="{Binding TvStations}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel AllowDrop="True" Drop="UIElement_OnDrop"  HorizontalAlignment="Stretch">
+                                <Image Stretch="UniformToFill" HorizontalAlignment="Center" Height="30" Source="{Binding Image}"></Image>
+                                <TextBlock Text="{Binding Name}"></TextBlock>
+                                <TextBlock Text="{Binding FileName}"></TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+
+            <StackPanel Grid.Column="1">
+                <Button Content="ON / OFF" Command="{Binding ToggleOnOff}" />
+                
+                <Button Content="Sender +" Command="{Binding ChangeStationCommand}">
+                    <Button.CommandParameter>
+                        <system:Int32>1</system:Int32>
+                    </Button.CommandParameter>
+                </Button>
+                <Button Content="Sender -" Command="{Binding ChangeStationCommand}" >
+                    <Button.CommandParameter>
+                        <system:Int32>-1</system:Int32>
+                    </Button.CommandParameter>
+                </Button>
+                <RepeatButton Content="Volume +" Command="{Binding ChangeVolumeCommand}">
+                    <RepeatButton.CommandParameter>
+                        <system:Int32>1</system:Int32>
+                    </RepeatButton.CommandParameter>
+                </RepeatButton>
+                <RepeatButton Content="Volume -" Command="{Binding ChangeVolumeCommand}" >
+                    <RepeatButton.CommandParameter>
+                        <system:Int32>-1</system:Int32>
+                    </RepeatButton.CommandParameter>
+                </RepeatButton>
+                <Button Content="Info" Command="{Binding ToggleInfoCommand}"></Button>
+            </StackPanel>
+
+        </Grid>
 
         <ListView Height="200" Grid.Row="1" ItemsSource="{Binding Log.Items}"></ListView>
     </Grid>

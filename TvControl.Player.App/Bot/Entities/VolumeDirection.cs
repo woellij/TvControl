@@ -5,8 +5,8 @@ namespace TvControl.Player.App.Bot.Entities
     public enum VolumeDirection
     {
         NONE,
-        [Synonyms("lauter")] Up,
-        [Synonyms("leiser")] Down
+        [Synonyms("lauter", "lauda", "lauder")] Up,
+        [Synonyms("leiser", "liza", "leise")] Down
 
     }
 }
